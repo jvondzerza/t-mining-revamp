@@ -3,30 +3,34 @@
    ============================================================ */
 
 :root {
-  /* — Light, warm-paper surfaces (the "ink" scale runs light → slightly darker) — */
-  --ink-900: #f4f2ec; /* page background */
+  /* — Core palette: maritime blues + emerald on crisp white, gold retained — */
+  --navy: #0f2a4c; /* deep base — headings, primary buttons, globe */
+  --cobalt: #2456e6; /* vivid interactive blue — links, arcs, hovers */
+  --sapphire: #0f52ba; /* deeper blue — the threat / serious states */
+  --emerald: #0f9d76; /* "secure / verified" success accent */
+  --charcoal: #33414b; /* charcoal grey — body text */
+
+  /* surfaces — crisp white running to cool light */
+  --ink-900: #fbfcfe; /* page background — crisp white */
   --ink-850: #ffffff; /* elevated surfaces / alternating sections */
-  --ink-800: #efece4; /* subtle alt fill */
-  --ink-700: #e7e3d9; /* blocks / inputs */
+  --ink-800: #eef2f8; /* subtle cool alt fill */
+  --ink-700: #e2e9f2; /* cool blocks / inputs */
 
-  --line: rgba(30, 26, 16, 0.12);
-  --line-strong: rgba(30, 26, 16, 0.2);
+  --line: rgba(15, 42, 76, 0.12);
+  --line-strong: rgba(15, 42, 76, 0.2);
 
-  /* text — the "fog" scale runs dark → faint on the light ground */
-  --fog-100: #1b1a16; /* headings, near-black */
-  --fog-200: #2b2920; /* body */
-  --fog-300: #524e44; /* lead */
-  --fog-400: #767064; /* muted */
-  --fog-500: #9d9789; /* faint */
+  /* text — the "fog" scale runs navy → faint slate on the white ground */
+  --fog-100: var(--navy); /* headings */
+  --fog-200: var(--charcoal); /* body */
+  --fog-300: #4e5e6b; /* lead */
+  --fog-400: #71808d; /* muted slate */
+  --fog-500: #9facb8; /* faint slate */
 
-  /* T-Mining brand gold — used sparingly, as a small accent only */
+  /* T-Mining brand gold — retained as the signature accent */
   --gold: #bf8f2e;
   --gold-bright: #d6a945;
   --gold-deep: #936c1d;
   --gold-glow: rgba(191, 143, 46, 0.28);
-
-  /* warm signal — used very sparingly for alerts/threat */
-  --ember: #cf4a2c;
 
   --bg: var(--ink-900);
   --text: var(--fog-200);
@@ -118,6 +122,7 @@ h4 {
   font-weight: 500;
   line-height: 0.98;
   letter-spacing: -0.02em;
+  color: var(--fog-100);
 }
 
 .display {
@@ -229,7 +234,7 @@ h4 {
   border-color: var(--fog-100);
 }
 .btn--primary::before {
-  background: #34312a;
+  background: var(--cobalt);
 }
 .btn--primary:hover {
   color: var(--ink-850);
