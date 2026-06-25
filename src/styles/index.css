@@ -1,0 +1,276 @@
+/* ============================================================
+   T-MINING — Design System
+   ============================================================ */
+
+:root {
+  /* — Light, warm-paper surfaces (the "ink" scale runs light → slightly darker) — */
+  --ink-900: #f4f2ec; /* page background */
+  --ink-850: #ffffff; /* elevated surfaces / alternating sections */
+  --ink-800: #efece4; /* subtle alt fill */
+  --ink-700: #e7e3d9; /* blocks / inputs */
+
+  --line: rgba(30, 26, 16, 0.12);
+  --line-strong: rgba(30, 26, 16, 0.2);
+
+  /* text — the "fog" scale runs dark → faint on the light ground */
+  --fog-100: #1b1a16; /* headings, near-black */
+  --fog-200: #2b2920; /* body */
+  --fog-300: #524e44; /* lead */
+  --fog-400: #767064; /* muted */
+  --fog-500: #9d9789; /* faint */
+
+  /* T-Mining brand gold — used sparingly, as a small accent only */
+  --gold: #bf8f2e;
+  --gold-bright: #d6a945;
+  --gold-deep: #936c1d;
+  --gold-glow: rgba(191, 143, 46, 0.28);
+
+  /* warm signal — used very sparingly for alerts/threat */
+  --ember: #cf4a2c;
+
+  --bg: var(--ink-900);
+  --text: var(--fog-200);
+  --muted: var(--fog-400);
+
+  /* type */
+  --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* layout */
+  --container: 1320px;
+  --gutter: clamp(20px, 5vw, 80px);
+  --radius: 16px;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ---------- reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: auto;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: inherit;
+}
+
+::selection {
+  background: var(--fog-100);
+  color: var(--ink-850);
+}
+
+/* ---------- typography ---------- */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  font-size: clamp(2.7rem, 8.2vw, 8.5rem);
+}
+
+.eyebrow {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--fog-400);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
+}
+.eyebrow::before {
+  content: '';
+  width: 28px;
+  height: 1px;
+  background: var(--gold);
+}
+
+.section-title {
+  font-size: clamp(2rem, 5.2vw, 4.4rem);
+  font-weight: 500;
+  line-height: 1.0;
+  letter-spacing: -0.025em;
+}
+
+.lead {
+  font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+  line-height: 1.5;
+  color: var(--fog-300);
+  font-weight: 400;
+}
+
+.text-gold {
+  color: var(--gold);
+}
+.text-muted {
+  color: var(--muted);
+}
+
+/* ---------- layout ---------- */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  position: relative;
+  padding-block: clamp(80px, 13vw, 180px);
+}
+
+/* ---------- buttons ---------- */
+.btn {
+  --bsize: 1px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.82em 1.45em;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  border-radius: 100px;
+  border: var(--bsize) solid var(--line-strong);
+  color: var(--fog-100);
+  background: transparent;
+  overflow: hidden;
+  transition: color 0.45s var(--ease-out), border-color 0.45s var(--ease-out);
+  z-index: 0;
+}
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--fog-100);
+  opacity: 0;
+  transition: opacity 0.45s var(--ease-out);
+  z-index: -1;
+}
+.btn:hover {
+  color: var(--ink-850);
+  border-color: var(--fog-100);
+}
+.btn:hover::before {
+  opacity: 1;
+}
+.btn .arrow {
+  transition: transform 0.45s var(--ease-out);
+}
+.btn:hover .arrow {
+  transform: translate(3px, -3px);
+}
+
+.btn--primary {
+  background: var(--fog-100);
+  color: var(--ink-850);
+  border-color: var(--fog-100);
+}
+.btn--primary::before {
+  background: #34312a;
+}
+.btn--primary:hover {
+  color: var(--ink-850);
+}
+
+/* ---------- utility ---------- */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  padding: 0.45em 0.9em;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fog-300);
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.tag .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 10px var(--gold-glow);
+}
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.025;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
