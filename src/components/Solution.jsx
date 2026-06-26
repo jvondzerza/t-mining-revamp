@@ -137,6 +137,18 @@ export default function Solution() {
                 </span>
                 <span className="release-card__status-text">{STEPS[active].status}</span>
               </div>
+
+              {/* mobile only: the steps live inside the card, sliding in below
+                  the status as the flow advances (hidden on desktop) */}
+              <div className="release-card__steps" aria-hidden="true">
+                {STEPS.map((s, i) => (
+                  <div key={s.k} className={`release-card__step ${i === active ? 'is-active' : ''}`}>
+                    <span className="release-card__step-n">0{i + 1}</span>
+                    <h3 className="release-card__step-title">{s.title}</h3>
+                    <p className="release-card__step-body">{s.body}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 

@@ -766,6 +766,28 @@ html.js .threat__risk-content {
   font-size: 1rem;
   color: var(--fog-100);
 }
+/* the in-card steps are mobile-only (folded into the card under the status) */
+.release-card__steps {
+  display: none;
+}
+.release-card__step-n {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+}
+.release-card__step-title {
+  margin-top: 0.55rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  line-height: 1.16;
+  color: var(--fog-100);
+}
+.release-card__step-body {
+  margin-top: 0.65rem;
+  font-size: 0.92rem;
+  color: var(--fog-300);
+}
 
 .solution__steps {
   list-style: none;
@@ -1395,23 +1417,28 @@ html.js .threat__risk-content {
   .release-card__status {
     margin-top: 1.8rem;
   }
-  /* the steps share one slot below the card and crossfade between each other */
+  /* the standalone steps column is folded into the card on mobile */
   .solution__steps {
-    position: relative;
-    display: block;
-    margin-top: clamp(1.4rem, 4vw, 2rem);
-    min-height: 250px;
+    display: none;
   }
-  .solution__step {
+  /* steps inside the card: stacked in one slot under the status, each fading +
+     sliding in from the side as the flow reaches it */
+  .release-card__steps {
+    display: block;
+    position: relative;
+    margin-top: 1.5rem;
+    min-height: 215px;
+  }
+  .release-card__step {
     position: absolute;
     inset: 0;
-    padding: 0;
-    border: 0;
     opacity: 0;
-    transition: opacity 0.45s var(--ease-out);
+    transform: translateX(28px);
+    transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
   }
-  .solution__step.is-active {
+  .release-card__step.is-active {
     opacity: 1;
+    transform: translateX(0);
   }
   .pillars__grid,
   .insights__grid {
