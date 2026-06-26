@@ -172,7 +172,7 @@ html.js .threat__risk-content {
   right: 0.9rem;
   bottom: 0.35rem;
   height: 1px;
-  background: var(--cobalt);
+  background: var(--azure);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.4s var(--ease-out);
@@ -298,15 +298,17 @@ html.js .threat__risk-content {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  /* stronger scrim so the headline + copy stay legible over the container yard */
   background:
-    radial-gradient(46% 38% at 72% 30%, rgba(191, 143, 46, 0.07), transparent 70%),
-    linear-gradient(180deg, transparent 0%, transparent 26%, var(--ink-900) 72%);
+    radial-gradient(46% 34% at 72% 24%, rgba(191, 143, 46, 0.06), transparent 70%),
+    linear-gradient(180deg, transparent 0%, transparent 28%, rgba(251, 252, 254, 0.86) 52%, var(--ink-900) 74%);
 }
 @media (min-width: 1025px) {
   .hero__glow {
     background:
-      radial-gradient(42% 50% at 74% 42%, rgba(191, 143, 46, 0.08), transparent 70%),
-      radial-gradient(75% 85% at 22% 78%, var(--ink-900) 32%, transparent 72%);
+      radial-gradient(45% 55% at 80% 30%, rgba(191, 143, 46, 0.06), transparent 70%),
+      linear-gradient(95deg, var(--ink-900) 0%, rgba(251, 252, 254, 0.88) 33%, rgba(251, 252, 254, 0.34) 52%, transparent 72%),
+      linear-gradient(0deg, var(--ink-900) 6%, transparent 40%);
   }
 }
 .hero__content {
@@ -354,15 +356,24 @@ html.js .threat__risk-content {
   gap: 0.9rem;
   justify-content: flex-end;
 }
+/* sit the cue on the right margin, vertically centred, so it never collides
+   with the bottom-anchored content (which fills the lower band edge-to-edge) */
 .hero__cue {
   position: absolute;
-  left: var(--gutter);
-  bottom: clamp(3rem, 7vh, 6rem);
+  right: clamp(14px, 2.4vw, 36px);
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.7rem;
   z-index: 2;
+}
+/* below desktop the layout is too cramped for it — let the content breathe */
+@media (max-width: 1024px) {
+  .hero__cue {
+    display: none;
+  }
 }
 .hero__cue-text {
   writing-mode: vertical-rl;
@@ -370,7 +381,9 @@ html.js .threat__risk-content {
   font-size: 0.7rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--fog-400);
+  color: var(--fog-100);
+  /* soft halo keeps it legible where it sits over the containers */
+  text-shadow: 0 1px 10px rgba(251, 252, 254, 0.9);
 }
 .hero__cue-line {
   width: 1px;
@@ -397,11 +410,12 @@ html.js .threat__risk-content {
   font-family: var(--font-display);
   font-size: 0.72rem;
   letter-spacing: 0.08em;
-  color: var(--fog-500);
+  color: var(--fog-400);
   text-align: right;
+  text-shadow: 0 1px 8px rgba(251, 252, 254, 0.85);
 }
 .hero__coords span:last-child {
-  color: var(--fog-300);
+  color: var(--fog-200);
   margin-top: 0.25rem;
 }
 
@@ -481,7 +495,7 @@ html.js .threat__risk-content {
  * ---------------------------------------------------------- */
 .threat {
   background:
-    radial-gradient(70% 50% at 80% 0%, rgba(15, 82, 186, 0.06), transparent 60%),
+    radial-gradient(70% 50% at 80% 0%, rgba(232, 99, 26, 0.06), transparent 60%),
     var(--ink-900);
   border-top: 1px solid var(--line);
 }
@@ -492,10 +506,10 @@ html.js .threat__risk-content {
   align-items: start;
 }
 .threat__eyebrow {
-  color: var(--sapphire);
+  color: var(--ember-deep);
 }
 .threat__eyebrow::before {
-  background: var(--sapphire);
+  background: var(--ember);
 }
 .threat__title {
   margin-top: 1.5rem;
@@ -508,9 +522,9 @@ html.js .threat__risk-content {
 .threat__pin {
   margin-top: 2.5rem;
   padding: 1.5rem;
-  border: 1px solid rgba(15, 82, 186, 0.25);
+  border: 1px solid rgba(232, 99, 26, 0.28);
   border-radius: var(--radius);
-  background: rgba(15, 82, 186, 0.04);
+  background: rgba(232, 99, 26, 0.05);
   max-width: 360px;
 }
 .threat__pin-label {
@@ -518,7 +532,7 @@ html.js .threat__risk-content {
   font-size: 0.72rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--sapphire);
+  color: var(--ember-deep);
 }
 .threat__pin-digits {
   display: flex;
@@ -547,7 +561,7 @@ html.js .threat__risk-content {
   display: block;
   height: 100%;
   width: 40%;
-  background: var(--sapphire);
+  background: var(--ember);
   animation: pinScan 1.8s var(--ease-io) infinite;
 }
 @keyframes pinScan {
@@ -578,7 +592,7 @@ html.js .threat__risk-content {
 .threat__risk-n {
   font-family: var(--font-display);
   font-size: 0.85rem;
-  color: var(--sapphire);
+  color: var(--ember-deep);
   padding-top: 0.2rem;
 }
 .threat__risk-title {
@@ -689,7 +703,7 @@ html.js .threat__risk-content {
 .release-card__rail span {
   display: block;
   height: 100%;
-  background: var(--emerald);
+  background: var(--azure);
   transform-origin: left;
   transition: transform 0.6s var(--ease-out);
 }
@@ -711,13 +725,13 @@ html.js .threat__risk-content {
   transition: all 0.4s var(--ease-out);
 }
 .release-node.is-done .release-node__dot {
-  background: var(--emerald);
-  border-color: var(--emerald);
+  background: var(--azure);
+  border-color: var(--azure);
 }
 .release-node.is-active .release-node__dot {
-  background: var(--emerald);
-  border-color: var(--emerald);
-  box-shadow: 0 0 0 5px rgba(15, 157, 118, 0.2);
+  background: var(--azure);
+  border-color: var(--azure);
+  box-shadow: 0 0 0 5px rgba(47, 127, 209, 0.22);
 }
 .release-node__name {
   font-family: var(--font-display);
@@ -728,7 +742,7 @@ html.js .threat__risk-content {
   transition: color 0.3s;
 }
 .release-node.is-active .release-node__name {
-  color: var(--emerald);
+  color: var(--azure-deep);
 }
 .release-card__status {
   margin-top: 2.4rem;
@@ -739,7 +753,7 @@ html.js .threat__risk-content {
   border-top: 1px solid var(--line);
 }
 .release-card__shield {
-  color: var(--emerald);
+  color: var(--azure-deep);
   display: inline-flex;
 }
 .release-card__status-text {
@@ -986,7 +1000,7 @@ html.js .threat__risk-content {
 .tech__link {
   width: 28px;
   height: 2px;
-  background: var(--emerald);
+  background: var(--azure);
   transform-origin: left center;
 }
 /* stack the chain + connecting line vertically on phones so it never wraps;
@@ -1198,8 +1212,8 @@ html.js .threat__risk-content {
   transition: color 0.3s, border-color 0.3s;
 }
 .cta__email:hover {
-  color: var(--cobalt);
-  border-color: var(--cobalt);
+  color: var(--azure-deep);
+  border-color: var(--azure-deep);
 }
 
 /* ---------------------------------------------------------- *
@@ -1259,7 +1273,7 @@ html.js .threat__risk-content {
   transition: color 0.3s;
 }
 .footer__link:hover {
-  color: var(--cobalt);
+  color: var(--azure-deep);
 }
 .footer__address {
   display: flex;
@@ -1299,11 +1313,11 @@ html.js .threat__risk-content {
   transition: transform 0.4s var(--ease-out), border-color 0.3s;
 }
 .footer__totop:hover {
-  color: var(--cobalt);
+  color: var(--azure-deep);
 }
 .footer__totop:hover span {
   transform: translateY(-4px);
-  border-color: var(--cobalt);
+  border-color: var(--azure-deep);
 }
 .footer__bar {
   display: flex;
