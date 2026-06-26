@@ -277,6 +277,9 @@ html.js .threat__risk-content {
   min-height: 100svh;
   display: flex;
   align-items: flex-end;
+  /* clear the fixed nav so the bottom-anchored content can't ride up under it
+     when it outgrows a short viewport */
+  padding-top: clamp(6.5rem, 12vh, 8rem);
   padding-bottom: clamp(3rem, 7vh, 6rem);
   overflow: hidden;
 }
