@@ -766,9 +766,26 @@ html.js .threat__risk-content {
   font-size: 1rem;
   color: var(--fog-100);
 }
-/* the in-card steps are mobile-only (folded into the card under the status) */
-.release-card__steps {
+/* the in-card carousel is mobile-only (folded into the card under the status);
+   hidden on desktop, where the steps are the side column instead */
+.release-carousel {
   display: none;
+}
+.release-card__steps {
+  position: relative;
+  margin-top: 1.4rem;
+  min-height: 215px;
+}
+.release-card__step {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateX(28px);
+  transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+}
+.release-card__step.is-active {
+  opacity: 1;
+  transform: translateX(0);
 }
 .release-card__step-n {
   font-family: var(--font-display);
@@ -787,6 +804,91 @@ html.js .threat__risk-content {
   margin-top: 0.65rem;
   font-size: 0.92rem;
   color: var(--fog-300);
+}
+/* segmented "duration" bars — fill over each slide, double as jump buttons */
+.release-carousel__bars {
+  display: flex;
+  gap: 7px;
+  margin-top: 0.4rem;
+}
+.release-carousel__bar {
+  flex: 1;
+  position: relative;
+  height: 22px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.release-carousel__bar::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 9px;
+  height: 4px;
+  border-radius: 3px;
+  background: rgba(15, 42, 76, 0.14);
+}
+.release-carousel__bar-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 9px;
+  height: 4px;
+  border-radius: 3px;
+  background: var(--azure-deep);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.release-carousel__bar:focus-visible {
+  outline: 2px solid var(--azure-deep);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.release-carousel__buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  margin-top: 0.9rem;
+}
+.release-carousel__btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  background: var(--ink-850);
+  color: var(--fog-100);
+  cursor: pointer;
+  transition: border-color 0.3s, color 0.3s, background 0.3s;
+}
+.release-carousel__btn:hover {
+  border-color: var(--azure-deep);
+  color: var(--azure-deep);
+}
+.release-carousel__btn:focus-visible {
+  outline: 2px solid var(--azure-deep);
+  outline-offset: 2px;
+}
+.release-carousel__btn--play {
+  background: var(--navy);
+  color: var(--ink-850);
+  border-color: var(--navy);
+}
+.release-carousel__btn--play:hover {
+  color: var(--ink-850);
+  border-color: var(--navy);
+}
+@media (prefers-reduced-motion: reduce) {
+  .release-card__step,
+  .release-card__step.is-active {
+    transition: opacity 0.2s linear;
+    transform: none;
+  }
 }
 
 .solution__steps {
@@ -1386,22 +1488,16 @@ html.js .threat__risk-content {
   .technology__grid {
     grid-template-columns: 1fr;
   }
-  /* mobile: pin the card + a step slot together as one stage, and crossfade the
-     active step in that slot. Nothing scrolls behind the card — scrolling just
-     scrubs which step is shown, driving the card's progress animation. */
+  /* mobile: the card is a normal in-flow element (no scroll pinning) — the steps
+     inside it autoplay as a carousel, so the user can freely scroll past */
   .solution__grid {
     display: block;
-    min-height: 220vh; /* scroll runway to scrub the 4 steps */
   }
   .solution__stage {
     display: block;
-    position: sticky;
-    top: clamp(72px, 10vh, 92px);
     max-width: 460px;
     margin-inline: auto;
   }
-  /* the stage does the pinning now — the card itself is a normal block inside it
-     (reset the desktop sticky so it occupies its full height) */
   .solution__visual {
     position: static;
   }
@@ -1417,28 +1513,12 @@ html.js .threat__risk-content {
   .release-card__status {
     margin-top: 1.8rem;
   }
-  /* the standalone steps column is folded into the card on mobile */
+  /* the standalone steps column is folded into the card's carousel on mobile */
   .solution__steps {
     display: none;
   }
-  /* steps inside the card: stacked in one slot under the status, each fading +
-     sliding in from the side as the flow reaches it */
-  .release-card__steps {
+  .release-carousel {
     display: block;
-    position: relative;
-    margin-top: 1.5rem;
-    min-height: 215px;
-  }
-  .release-card__step {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transform: translateX(28px);
-    transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
-  }
-  .release-card__step.is-active {
-    opacity: 1;
-    transform: translateX(0);
   }
   .pillars__grid,
   .insights__grid {
