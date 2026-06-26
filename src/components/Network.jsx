@@ -34,8 +34,29 @@ function Counter({ value, suffix, fmt }) {
 }
 
 export default function Network() {
+  const root = useRef(null)
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // animate only the content of each stat — the grid cells + dividers stay put
+      gsap.fromTo(
+        '.stat__content',
+        { y: 22, autoAlpha: 0 },
+        {
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.9,
+          ease: 'power3.out',
+          stagger: 0.1,
+          scrollTrigger: { trigger: '.network__stats', start: 'top 82%' },
+        }
+      )
+    }, root)
+    return () => ctx.revert()
+  }, [])
+
   return (
-    <section className="section network" id="network">
+    <section className="section network" id="network" ref={root}>
       <div className="container">
         <div className="network__head">
           <span className="eyebrow" data-reveal="up">The network effect</span>
@@ -49,11 +70,13 @@ export default function Network() {
           </p>
         </div>
 
-        <div className="network__stats" data-reveal="stagger">
+        <div className="network__stats">
           {STATS.map((s) => (
-            <div className="stat" key={s.label} data-stagger-item>
-              <Counter value={s.value} suffix={s.suffix} fmt={s.fmt} />
-              <span className="stat__label">{s.label}</span>
+            <div className="stat" key={s.label}>
+              <span className="stat__content">
+                <Counter value={s.value} suffix={s.suffix} fmt={s.fmt} />
+                <span className="stat__label">{s.label}</span>
+              </span>
             </div>
           ))}
         </div>

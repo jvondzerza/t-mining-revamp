@@ -45,19 +45,19 @@ export default function Threat() {
         }
       )
 
-      gsap.utils.toArray('.threat__risk').forEach((node) => {
-        gsap.fromTo(
-          node,
-          { x: 40, autoAlpha: 0 },
-          {
-            x: 0,
-            autoAlpha: 1,
-            duration: 1,
-            ease: 'power3.out',
-            scrollTrigger: { trigger: node, start: 'top 86%' },
-          }
-        )
-      })
+      // animate only the content of each risk — the cells + dividers stay put
+      gsap.fromTo(
+        '.threat__risk-content',
+        { x: 28, autoAlpha: 0 },
+        {
+          x: 0,
+          autoAlpha: 1,
+          duration: 0.9,
+          ease: 'power3.out',
+          stagger: 0.12,
+          scrollTrigger: { trigger: '.threat__right', start: 'top 82%' },
+        }
+      )
       return () => tween && tween.kill()
     }, root)
     return () => ctx.revert()
@@ -90,10 +90,12 @@ export default function Threat() {
         <div className="threat__right">
           {RISKS.map((r) => (
             <article className="threat__risk" key={r.n}>
-              <span className="threat__risk-n">{r.n}</span>
-              <div>
-                <h3 className="threat__risk-title">{r.title}</h3>
-                <p className="threat__risk-body">{r.body}</p>
+              <div className="threat__risk-content">
+                <span className="threat__risk-n">{r.n}</span>
+                <div>
+                  <h3 className="threat__risk-title">{r.title}</h3>
+                  <p className="threat__risk-body">{r.body}</p>
+                </div>
               </div>
             </article>
           ))}

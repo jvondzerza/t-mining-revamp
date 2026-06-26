@@ -7,7 +7,9 @@
    only its [data-stagger-item] children are hidden, otherwise the whole grid
    would never appear. */
 html.js [data-reveal='up'],
-html.js [data-stagger-item] {
+html.js [data-stagger-item],
+html.js .stat__content,
+html.js .threat__risk-content {
   opacity: 0;
 }
 .mask {
@@ -21,7 +23,9 @@ html.js [data-stagger-item] {
 
 @media (prefers-reduced-motion: reduce) {
   html.js [data-reveal='up'],
-  html.js [data-stagger-item] {
+  html.js [data-stagger-item],
+  html.js .stat__content,
+  html.js .threat__risk-content {
     opacity: 1 !important;
   }
 }
@@ -557,14 +561,16 @@ html.js [data-stagger-item] {
   overflow: hidden;
 }
 .threat__risk {
-  display: flex;
-  gap: 1.3rem;
   padding: 1.8rem;
   background: var(--ink-850);
   transition: background 0.4s var(--ease-out);
 }
 .threat__risk:hover {
   background: var(--ink-800);
+}
+.threat__risk-content {
+  display: flex;
+  gap: 1.3rem;
 }
 .threat__risk-n {
   font-family: var(--font-display);
@@ -899,6 +905,11 @@ html.js [data-stagger-item] {
 }
 .stat:hover {
   background: var(--ink-800);
+}
+.stat__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
 }
 .stat__num {
   display: flex;
