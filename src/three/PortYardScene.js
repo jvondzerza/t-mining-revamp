@@ -9,16 +9,13 @@ import containerUrl from '../assets/container.glb?url'
  * .glb) is GPU-instanced thousands of times in two draw calls (its doors
  * + its sides), and each instance is recoloured by a per-instance
  * HSV hue-shift baked into the material — so one red model becomes a
- * whole varied maritime fleet. A gold "verified" hexagon token hovers
- * over the focal stack and stamps a chain-seal ring on a loop; a warm
- * light-sweep crosses the yard.
+ * whole varied maritime fleet. A warm light-sweep crosses the yard.
  *
  * Drop-in replacement for GlobeScene: same public interface
  * (constructor(canvas, { mobile }), setPointer, pause, resume, dispose).
  * ------------------------------------------------------------------ */
 
 const BG = '#fbfcfe' // page background — distant rows dissolve into it
-const GOLD = new THREE.Color('#bf8f2e')
 
 const CL = 2.2 // target container length (scene units) — sets the overall scale
 
@@ -107,7 +104,6 @@ export default class PortYardScene {
           const parts = this._prepareModel(gltf)
           const layout = this._computeLayout(CL, parts.H, parts.D)
           this._buildYard(parts, layout)
-          this._buildFocal(layout.focal)
         } catch (err) {
           if (import.meta.env.DEV) console.warn('[PortYard] model build failed:', err?.message)
           this._buildFallbackYard()
@@ -178,7 +174,6 @@ export default class PortYardScene {
 
     const inst = []
     const rand = mulberry32(20240626)
-    let focal = null
     for (let c = 0; c < cols; c++) {
       for (let r = 0; r < rows; r++) {
         if (rand() < 0.14) continue // gaps — an active, lived-in yard
@@ -186,13 +181,9 @@ export default class PortYardScene {
         const pz = r * cellZ - zSpan + 6
         const maxStack = 1 + Math.floor(rand() * rand() * 5)
         for (let s = 0; s < maxStack; s++) inst.push({ x: px, y: s * H, z: pz })
-        if (!focal && pz > 2.5 && px > xSpan * 0.06 && px < xSpan * 0.2 && maxStack >= 2) {
-          focal = { x: px, y: maxStack * H, z: pz }
-        }
       }
     }
-    if (!focal) focal = { x: xSpan * 0.12, y: H * 2, z: 4 }
-    return { inst, focal, rand }
+    return { inst }
   }
 
   _buildYard({ parts }, { inst }) {
@@ -241,12 +232,10 @@ export default class PortYardScene {
     if (this._disposed) return
     const H = 0.78
     const D = 0.78
-    const layout = this._computeLayout(CL, H, D)
-    const { inst, focal } = layout
+    const { inst } = this._computeLayout(CL, H, D)
     const count = inst.length
 
     const geo = new THREE.BoxGeometry(CL, H, D)
-    geo.translate(0, 0, 0)
     const mat = new THREE.MeshStandardMaterial({ roughness: 0.8, metalness: 0.05 })
     this._patchSweepOnly(mat)
     const mesh = new THREE.InstancedMesh(geo, mat, count)
@@ -269,7 +258,6 @@ export default class PortYardScene {
     mesh.frustumCulled = false
     this.scene.add(mesh)
     this.yardMeshes.push(mesh)
-    this._buildFocal(focal)
   }
 
   // inject the per-instance hue-shift recolour + the travelling light-sweep
@@ -340,49 +328,6 @@ export default class PortYardScene {
     mat.needsUpdate = true
   }
 
-  _buildFocal(focal) {
-    if (this._disposed) return
-    this.focalGroup = new THREE.Group()
-    this.focalGroup.position.set(focal.x, focal.y, focal.z)
-    this.scene.add(this.focalGroup)
-
-    const hexGeo = new THREE.CircleGeometry(0.42, 6)
-    const hexMat = new THREE.MeshStandardMaterial({
-      color: GOLD,
-      emissive: new THREE.Color('#7a5a18'),
-      emissiveIntensity: 0.6,
-      metalness: 0.7,
-      roughness: 0.3,
-      side: THREE.DoubleSide,
-      fog: false,
-    })
-    this.token = new THREE.Mesh(hexGeo, hexMat)
-    this.token.rotation.x = -Math.PI / 2.1
-    this.token.position.y = 0.9
-    this.focalGroup.add(this.token)
-
-    const ringGeo = new THREE.RingGeometry(0.22, 0.3, 6)
-    const ringMat = new THREE.MeshBasicMaterial({ color: '#fff4d8', transparent: true, opacity: 0.85, side: THREE.DoubleSide, fog: false })
-    const tokenRing = new THREE.Mesh(ringGeo, ringMat)
-    tokenRing.position.z = 0.01
-    this.token.add(tokenRing)
-
-    const sealGeo = new THREE.RingGeometry(0.45, 0.58, 48)
-    this.sealMat = new THREE.MeshBasicMaterial({ color: GOLD, transparent: true, opacity: 0, side: THREE.DoubleSide, fog: false })
-    this.seal = new THREE.Mesh(sealGeo, this.sealMat)
-    this.seal.rotation.x = -Math.PI / 2.1
-    this.seal.position.y = 0.05
-    this.focalGroup.add(this.seal)
-
-    const glow = new THREE.Sprite(
-      new THREE.SpriteMaterial({ map: radialGlow(), color: GOLD, transparent: true, opacity: 0.5, depthWrite: false, fog: false })
-    )
-    glow.scale.set(2.4, 2.4, 1)
-    glow.position.y = 0.9
-    this.focalGroup.add(glow)
-    this._tokenGlow = glow
-  }
-
   setPointer(nx, ny) {
     this.target.set(nx, ny)
   }
@@ -402,25 +347,9 @@ export default class PortYardScene {
     this.camera.position.z = this.camBase.z + Math.cos(t * 0.06) * 0.8
     this.camera.lookAt(this.camLook.x + px * 1.2, this.camLook.y, this.camLook.z)
 
-    // sweep travels across the yard width on a slow loop
+    // warm light-sweep travels across the yard width on a loop
     const span = 60
-    this.uSweep.value = ((t * 7) % (span * 2)) - span
-
-    if (this.token) {
-      this.token.rotation.z = t * 0.5
-      const bob = Math.sin(t * 1.6) * 0.06
-      this.token.position.y = 0.9 + bob
-      this._tokenGlow.position.y = 0.9 + bob
-      const pulse = 0.5 + Math.sin(t * 1.6) * 0.5
-      this.token.material.emissiveIntensity = 0.4 + pulse * 0.5
-      this._tokenGlow.material.opacity = 0.35 + pulse * 0.25
-
-      const cycle = (t % 5) / 5
-      const k = Math.min(1, cycle / 0.5)
-      const out = easeOutCubic(k)
-      this.seal.scale.setScalar(0.6 + out * 2.4)
-      this.sealMat.opacity = (1 - out) * 0.7 * (cycle < 0.5 ? 1 : 0)
-    }
+    this.uSweep.value = ((t * 16) % (span * 2)) - span
 
     this.renderer.render(this.scene, this.camera)
   }
@@ -504,20 +433,3 @@ function mulberry32(a) {
   }
 }
 
-function easeOutCubic(x) {
-  return 1 - Math.pow(1 - x, 3)
-}
-
-function radialGlow() {
-  const s = 128
-  const cv = document.createElement('canvas')
-  cv.width = cv.height = s
-  const ctx = cv.getContext('2d')
-  const g = ctx.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2)
-  g.addColorStop(0, 'rgba(255,255,255,0.9)')
-  g.addColorStop(0.3, 'rgba(255,225,160,0.55)')
-  g.addColorStop(1, 'rgba(255,225,160,0)')
-  ctx.fillStyle = g
-  ctx.fillRect(0, 0, s, s)
-  return new THREE.CanvasTexture(cv)
-}
