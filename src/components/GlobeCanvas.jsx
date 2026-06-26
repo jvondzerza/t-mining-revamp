@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
-// Hero concept: "Instanced port-yard" — drop-in replacement for GlobeScene
-import GlobeScene from '../three/PortYardScene'
+// The hero canvas scene — the instanced port-yard
+import HeroScene from '../three/PortYardScene'
 
 export default function GlobeCanvas() {
   const canvasRef = useRef(null)
@@ -17,12 +17,12 @@ export default function GlobeCanvas() {
     // defer one frame so layout (clientWidth/Height) is settled
     const id = requestAnimationFrame(() => {
       try {
-        scene = new GlobeScene(canvas, { mobile })
+        scene = new HeroScene(canvas, { mobile })
         sceneRef.current = scene
         if (reduce) scene.pause()
       } catch (err) {
         // WebGL unavailable / context lost — leave the CSS gradient as backdrop
-        if (import.meta.env.DEV) console.warn('[GlobeScene] init failed:', err?.message)
+        if (import.meta.env.DEV) console.warn('[HeroScene] init failed:', err?.message)
       }
     })
 

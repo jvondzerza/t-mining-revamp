@@ -17,8 +17,8 @@ import dpLogo from '../assets/logos/dp-world.svg?url'
  * recoloured to the livery and the side gets the carrier name stencilled
  * on. A warm light-sweep crosses the yard.
  *
- * Drop-in replacement for GlobeScene: same public interface
- * (constructor(canvas, { mobile }), setPointer, pause, resume, dispose).
+ * Mounted by GlobeCanvas via the shared hero-scene interface:
+ * constructor(canvas, { mobile }), setPointer, pause, resume, dispose.
  * ------------------------------------------------------------------ */
 
 const BG = '#fbfcfe' // page background — distant rows dissolve into it
