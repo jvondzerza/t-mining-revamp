@@ -7,9 +7,10 @@ import containerUrl from '../assets/container.glb?url'
  * A low 3/4 view across an endless, fog-faded field of stacked shipping
  * containers. A single low-poly container model (super_low_poly_container
  * .glb) is GPU-instanced thousands of times in two draw calls (its doors
- * + its sides), and each instance is recoloured by a per-instance
- * HSV hue-shift baked into the material — so one red model becomes a
- * whole varied maritime fleet. A warm light-sweep crosses the yard.
+ * + its sides), and each instance is repainted in a real carrier's livery
+ * (MSC, CMA CGM, Hapag-Lloyd, DP World — the container operators from the
+ * marquee) by remapping the red texture's shading onto the carrier colour.
+ * A warm light-sweep crosses the yard.
  *
  * Drop-in replacement for GlobeScene: same public interface
  * (constructor(canvas, { mobile }), setPointer, pause, resume, dispose).
@@ -189,16 +190,15 @@ export default class PortYardScene {
   _buildYard({ parts }, { inst }) {
     const count = inst.length
 
-    // per-instance HSV recolour attributes (one red model → a varied fleet)
-    const aHue = new Float32Array(count)
-    const aSat = new Float32Array(count)
-    const aVal = new Float32Array(count)
+    // per-instance carrier colour (one red model → a real-livery fleet)
+    const aCarrier = new Float32Array(count * 3)
     const rand = mulberry32(1337)
+    const c = new THREE.Color()
     for (let i = 0; i < count; i++) {
-      const c = pickColor(rand)
-      aHue[i] = c.h
-      aSat[i] = c.s
-      aVal[i] = c.v
+      pickCarrier(rand, c)
+      aCarrier[i * 3] = c.r
+      aCarrier[i * 3 + 1] = c.g
+      aCarrier[i * 3 + 2] = c.b
     }
 
     const m = new THREE.Matrix4()
@@ -207,9 +207,7 @@ export default class PortYardScene {
     const pos = new THREE.Vector3()
 
     parts.forEach(({ geometry, material }) => {
-      geometry.setAttribute('aHue', new THREE.InstancedBufferAttribute(aHue, 1))
-      geometry.setAttribute('aSat', new THREE.InstancedBufferAttribute(aSat, 1))
-      geometry.setAttribute('aVal', new THREE.InstancedBufferAttribute(aVal, 1))
+      geometry.setAttribute('aCarrier', new THREE.InstancedBufferAttribute(aCarrier, 3))
       this._patchMaterial(material)
 
       const mesh = new THREE.InstancedMesh(geometry, material, count)
@@ -249,8 +247,7 @@ export default class PortYardScene {
       pos.set(it.x, it.y + H / 2, it.z)
       m.compose(pos, q, scl)
       mesh.setMatrixAt(i, m)
-      const c = pickColor(rand)
-      col.setHSL(c.h, c.s * 0.85, 0.26 + c.v * 0.16)
+      pickCarrier(rand, col)
       mesh.setColorAt(i, col)
     })
     mesh.instanceMatrix.needsUpdate = true
@@ -260,7 +257,7 @@ export default class PortYardScene {
     this.yardMeshes.push(mesh)
   }
 
-  // inject the per-instance hue-shift recolour + the travelling light-sweep
+  // inject the per-instance carrier-livery recolour + the travelling light-sweep
   _patchMaterial(mat) {
     mat.onBeforeCompile = (shader) => {
       shader.uniforms.uSweep = this.uSweep
@@ -269,33 +266,29 @@ export default class PortYardScene {
         .replace(
           '#include <common>',
           `#include <common>
-           attribute float aHue; attribute float aSat; attribute float aVal;
-           varying vec3 vWPos; varying float vHue; varying float vSat; varying float vVal;`
+           attribute vec3 aCarrier;
+           varying vec3 vWPos; varying vec3 vCarrier;`
         )
         .replace(
           '#include <begin_vertex>',
           `#include <begin_vertex>
            vWPos = (modelMatrix * instanceMatrix * vec4(transformed, 1.0)).xyz;
-           vHue = aHue; vSat = aSat; vVal = aVal;`
+           vCarrier = aCarrier;`
         )
       shader.fragmentShader = shader.fragmentShader
         .replace(
           '#include <common>',
           `#include <common>
            uniform float uSweep; uniform vec3 uSweepColor;
-           varying vec3 vWPos; varying float vHue; varying float vSat; varying float vVal;
-           vec3 rgb2hsv(vec3 c){vec4 K=vec4(0.,-1./3.,2./3.,-1.);vec4 p=mix(vec4(c.bg,K.wz),vec4(c.gb,K.xy),step(c.b,c.g));vec4 q=mix(vec4(p.xyw,c.r),vec4(c.r,p.yzx),step(p.x,c.r));float d=q.x-min(q.w,q.y);float e=1.0e-10;return vec3(abs(q.z+(q.w-q.y)/(6.0*d+e)),d/(q.x+e),q.x);}
-           vec3 hsv2rgb(vec3 c){vec4 K=vec4(1.,2./3.,1./3.,3.);vec3 p=abs(fract(c.xxx+K.xyz)*6.0-K.www);return c.z*mix(K.xxx,clamp(p-K.xxx,0.0,1.0),c.y);}`
+           varying vec3 vWPos; varying vec3 vCarrier;`
         )
         .replace(
           '#include <map_fragment>',
           `#include <map_fragment>
            {
-             vec3 hsv = rgb2hsv(diffuseColor.rgb);
-             hsv.x = vHue;
-             hsv.y = clamp(hsv.y * vSat, 0.0, 1.0);
-             hsv.z = clamp(hsv.z * vVal, 0.0, 1.0);
-             diffuseColor.rgb = hsv2rgb(hsv);
+             // remap the red texture's shading onto the carrier livery colour
+             float shade = dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114));
+             diffuseColor.rgb = clamp(vCarrier * (0.18 + shade * 4.2), 0.0, 1.0);
            }`
         )
         .replace(
@@ -395,31 +388,29 @@ export default class PortYardScene {
 
 /* ---------- helpers ---------- */
 
-// weighted maritime hue palette — mostly blues/teals, rare rust + gold accents.
-// returns { h: hue 0..1, s: saturation multiplier, v: value multiplier }
-const HUE_TABLE = [
-  { h: [0.58, 0.63], s: [0.62, 0.82], v: [0.95, 1.08], w: 5 }, // deep blue
-  { h: [0.54, 0.58], s: [0.62, 0.8], v: [0.95, 1.08], w: 4 }, // steel blue
-  { h: [0.48, 0.53], s: [0.6, 0.8], v: [0.95, 1.08], w: 3 }, // teal
-  { h: [0.6, 0.64], s: [0.4, 0.55], v: [1.0, 1.14], w: 3 }, // slate (paler, for contrast)
-  { h: [0.44, 0.48], s: [0.55, 0.72], v: [0.9, 1.02], w: 2 }, // green-teal
-  { h: [0.02, 0.06], s: [0.6, 0.78], v: [0.85, 0.98], w: 1.4 }, // rust
-  { h: [0.1, 0.13], s: [0.82, 0.98], v: [1.02, 1.16], w: 1.2 }, // gold accent
+// real carrier liveries — only the marquee entries that run branded container
+// fleets, each weighted by how common their boxes are. (The other marquee
+// names are ports/platforms/roles with no container livery of their own.)
+const CARRIERS = [
+  { name: 'MSC', color: new THREE.Color('#e0a92e'), w: 4 }, // mustard gold
+  { name: 'CMA CGM', color: new THREE.Color('#3f7cc2'), w: 4 }, // mid blue
+  { name: 'Hapag-Lloyd', color: new THREE.Color('#e8631a'), w: 3 }, // orange
+  { name: 'DP World', color: new THREE.Color('#1b4a86'), w: 2 }, // navy
 ]
-const HUE_TOTAL = HUE_TABLE.reduce((a, b) => a + b.w, 0)
+const CARRIER_TOTAL = CARRIERS.reduce((a, b) => a + b.w, 0)
 
-function pickColor(rand) {
-  let r = rand() * HUE_TOTAL
-  let row = HUE_TABLE[0]
-  for (const e of HUE_TABLE) {
+// pick a weighted carrier colour (with a touch of per-box weathering) into `out`
+function pickCarrier(rand, out) {
+  let r = rand() * CARRIER_TOTAL
+  let row = CARRIERS[0]
+  for (const e of CARRIERS) {
     if (r < e.w) {
       row = e
       break
     }
     r -= e.w
   }
-  const lerp = (a, b) => a + (b - a) * rand()
-  return { h: lerp(row.h[0], row.h[1]), s: lerp(row.s[0], row.s[1]), v: lerp(row.v[0], row.v[1]) }
+  return out.copy(row.color).multiplyScalar(0.9 + rand() * 0.16)
 }
 
 // deterministic PRNG so the yard layout + colours are stable across reloads
