@@ -38,11 +38,16 @@ export default function Solution() {
       const grid = root.current.querySelector('.solution__grid')
       const card = root.current.querySelector('.release-card')
 
-      // The active step is the one whose centre is closest to the sticky card's
-      // centre line (top:18vh + half the card height) — so the card updates as it
-      // lines up with the middle of each step, not its top.
+      // The active step is the one whose centre is closest to the card's centre
+      // line, so the card updates as it lines up with the middle of each step.
+      // Desktop: the card sits beside the steps (centre ≈ top:18vh + half its
+      // height). Mobile: the card is pinned at the top and the steps scroll
+      // through the band below it, so we target a point in the lower viewport.
       const pickActive = () => {
-        const cardLine = window.innerHeight * 0.18 + (card?.offsetHeight || 0) / 2
+        const mobile = window.matchMedia('(max-width: 1024px)').matches
+        const cardLine = mobile
+          ? window.innerHeight * 0.6
+          : window.innerHeight * 0.18 + (card?.offsetHeight || 0) / 2
         let best = 0
         let bestDist = Infinity
         steps.forEach((step, i) => {
