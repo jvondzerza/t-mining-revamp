@@ -145,7 +145,7 @@ export default class GlobeScene {
       depthWrite: false,
       uniforms: {
         uTime: { value: 0 },
-        uColor: { value: new THREE.Color('#544c3b') },
+        uColor: { value: new THREE.Color('#16365f') },
         uSize: { value: (this.mobile ? 2.3 : 2.7) * this.renderer.getPixelRatio() },
       },
       vertexShader: /* glsl */ `
@@ -182,7 +182,7 @@ export default class GlobeScene {
     // reads as a solid sphere (subtle shading) rather than a busy see-through ball
     const shell = new THREE.Mesh(
       new THREE.SphereGeometry(R * 0.99, 48, 48),
-      new THREE.MeshBasicMaterial({ color: new THREE.Color('#efebe1') })
+      new THREE.MeshBasicMaterial({ color: new THREE.Color('#eef3f9') })
     )
     this.group.add(shell)
   }
@@ -283,7 +283,7 @@ export default class GlobeScene {
       blending: THREE.NormalBlending,
       uniforms: {
         uTime: { value: 0 },
-        uBase: { value: new THREE.Color('#988e78') },
+        uBase: { value: new THREE.Color('#6a82c8') },
         uBright: { value: new THREE.Color('#bf8f2e') },
       },
       vertexShader: /* glsl */ `

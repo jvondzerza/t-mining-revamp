@@ -12,9 +12,9 @@ export default function Mission() {
       const words = gsap.utils.toArray('.mission__word')
       gsap.fromTo(
         words,
-        { color: 'rgba(120,114,100,0.35)' },
+        { color: 'rgba(113,128,141,0.4)' },
         {
-          color: '#1b1a16',
+          color: '#0f2a4c',
           stagger: 0.5,
           ease: 'none',
           scrollTrigger: {

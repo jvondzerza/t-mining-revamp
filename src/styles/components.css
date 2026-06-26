@@ -7,7 +7,9 @@
    only its [data-stagger-item] children are hidden, otherwise the whole grid
    would never appear. */
 html.js [data-reveal='up'],
-html.js [data-stagger-item] {
+html.js [data-stagger-item],
+html.js .stat__content,
+html.js .threat__risk-content {
   opacity: 0;
 }
 .mask {
@@ -21,7 +23,9 @@ html.js [data-stagger-item] {
 
 @media (prefers-reduced-motion: reduce) {
   html.js [data-reveal='up'],
-  html.js [data-stagger-item] {
+  html.js [data-stagger-item],
+  html.js .stat__content,
+  html.js .threat__risk-content {
     opacity: 1 !important;
   }
 }
@@ -44,7 +48,7 @@ html.js [data-stagger-item] {
 }
 .preloader__panel {
   background: var(--ink-850);
-  border-right: 1px solid rgba(30, 26, 16, 0.02);
+  border-right: 1px solid rgba(15, 42, 76, 0.02);
   transform-origin: bottom;
 }
 .preloader__inner {
@@ -86,7 +90,7 @@ html.js [data-stagger-item] {
 .preloader__track {
   margin-top: 1rem;
   height: 1px;
-  background: rgba(30, 26, 16, 0.12);
+  background: rgba(15, 42, 76, 0.12);
   overflow: hidden;
 }
 .preloader__bar {
@@ -117,7 +121,7 @@ html.js [data-stagger-item] {
   border-bottom: 1px solid transparent;
 }
 .nav.is-scrolled {
-  background: rgba(244, 242, 236, 0.78);
+  background: rgba(251, 252, 254, 0.82);
   backdrop-filter: blur(14px) saturate(140%);
   -webkit-backdrop-filter: blur(14px) saturate(140%);
   border-bottom-color: var(--line);
@@ -168,7 +172,7 @@ html.js [data-stagger-item] {
   right: 0.9rem;
   bottom: 0.35rem;
   height: 1px;
-  background: var(--gold);
+  background: var(--cobalt);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.4s var(--ease-out);
@@ -273,6 +277,9 @@ html.js [data-stagger-item] {
   min-height: 100svh;
   display: flex;
   align-items: flex-end;
+  /* clear the fixed nav so the bottom-anchored content can't ride up under it
+     when it outgrows a short viewport */
+  padding-top: clamp(6.5rem, 12vh, 8rem);
   padding-bottom: clamp(3rem, 7vh, 6rem);
   overflow: hidden;
 }
@@ -368,7 +375,7 @@ html.js [data-stagger-item] {
 .hero__cue-line {
   width: 1px;
   height: 60px;
-  background: rgba(30, 26, 16, 0.14);
+  background: rgba(15, 42, 76, 0.14);
   overflow: hidden;
   position: relative;
 }
@@ -474,7 +481,7 @@ html.js [data-stagger-item] {
  * ---------------------------------------------------------- */
 .threat {
   background:
-    radial-gradient(70% 50% at 80% 0%, rgba(255, 107, 74, 0.06), transparent 60%),
+    radial-gradient(70% 50% at 80% 0%, rgba(15, 82, 186, 0.06), transparent 60%),
     var(--ink-900);
   border-top: 1px solid var(--line);
 }
@@ -485,10 +492,10 @@ html.js [data-stagger-item] {
   align-items: start;
 }
 .threat__eyebrow {
-  color: var(--ember);
+  color: var(--sapphire);
 }
 .threat__eyebrow::before {
-  background: var(--ember);
+  background: var(--sapphire);
 }
 .threat__title {
   margin-top: 1.5rem;
@@ -501,9 +508,9 @@ html.js [data-stagger-item] {
 .threat__pin {
   margin-top: 2.5rem;
   padding: 1.5rem;
-  border: 1px solid rgba(255, 107, 74, 0.25);
+  border: 1px solid rgba(15, 82, 186, 0.25);
   border-radius: var(--radius);
-  background: rgba(255, 107, 74, 0.04);
+  background: rgba(15, 82, 186, 0.04);
   max-width: 360px;
 }
 .threat__pin-label {
@@ -511,7 +518,7 @@ html.js [data-stagger-item] {
   font-size: 0.72rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--ember);
+  color: var(--sapphire);
 }
 .threat__pin-digits {
   display: flex;
@@ -526,21 +533,21 @@ html.js [data-stagger-item] {
   font-family: var(--font-display);
   font-size: 1.6rem;
   color: var(--fog-100);
-  background: rgba(30, 26, 16, 0.03);
+  background: rgba(15, 42, 76, 0.03);
   border: 1px solid var(--line);
   border-radius: 8px;
 }
 .threat__pin-bar {
   margin-top: 1rem;
   height: 2px;
-  background: rgba(30, 26, 16, 0.08);
+  background: rgba(15, 42, 76, 0.08);
   overflow: hidden;
 }
 .threat__pin-bar i {
   display: block;
   height: 100%;
   width: 40%;
-  background: var(--ember);
+  background: var(--sapphire);
   animation: pinScan 1.8s var(--ease-io) infinite;
 }
 @keyframes pinScan {
@@ -557,8 +564,6 @@ html.js [data-stagger-item] {
   overflow: hidden;
 }
 .threat__risk {
-  display: flex;
-  gap: 1.3rem;
   padding: 1.8rem;
   background: var(--ink-850);
   transition: background 0.4s var(--ease-out);
@@ -566,10 +571,14 @@ html.js [data-stagger-item] {
 .threat__risk:hover {
   background: var(--ink-800);
 }
+.threat__risk-content {
+  display: flex;
+  gap: 1.3rem;
+}
 .threat__risk-n {
   font-family: var(--font-display);
   font-size: 0.85rem;
-  color: var(--ember);
+  color: var(--sapphire);
   padding-top: 0.2rem;
 }
 .threat__risk-title {
@@ -615,7 +624,7 @@ html.js [data-stagger-item] {
   border-radius: 20px;
   border: 1px solid var(--line-strong);
   background: var(--ink-850);
-  box-shadow: 0 26px 60px -40px rgba(30, 26, 16, 0.4);
+  box-shadow: 0 26px 60px -40px rgba(15, 42, 76, 0.4);
   overflow: hidden;
 }
 .release-card::before {
@@ -674,13 +683,13 @@ html.js [data-stagger-item] {
   right: 6%;
   top: 7px;
   height: 2px;
-  background: rgba(30, 26, 16, 0.1);
+  background: rgba(15, 42, 76, 0.1);
   z-index: 0;
 }
 .release-card__rail span {
   display: block;
   height: 100%;
-  background: var(--gold);
+  background: var(--emerald);
   transform-origin: left;
   transition: transform 0.6s var(--ease-out);
 }
@@ -698,17 +707,17 @@ html.js [data-stagger-item] {
   height: 16px;
   border-radius: 50%;
   background: var(--ink-700);
-  border: 2px solid rgba(30, 26, 16, 0.15);
+  border: 2px solid rgba(15, 42, 76, 0.15);
   transition: all 0.4s var(--ease-out);
 }
 .release-node.is-done .release-node__dot {
-  background: var(--gold-deep);
-  border-color: var(--gold-deep);
+  background: var(--emerald);
+  border-color: var(--emerald);
 }
 .release-node.is-active .release-node__dot {
-  background: var(--gold);
-  border-color: var(--gold);
-  box-shadow: 0 0 0 5px rgba(191, 143, 46, 0.18);
+  background: var(--emerald);
+  border-color: var(--emerald);
+  box-shadow: 0 0 0 5px rgba(15, 157, 118, 0.2);
 }
 .release-node__name {
   font-family: var(--font-display);
@@ -719,7 +728,7 @@ html.js [data-stagger-item] {
   transition: color 0.3s;
 }
 .release-node.is-active .release-node__name {
-  color: var(--gold);
+  color: var(--emerald);
 }
 .release-card__status {
   margin-top: 2.4rem;
@@ -730,7 +739,7 @@ html.js [data-stagger-item] {
   border-top: 1px solid var(--line);
 }
 .release-card__shield {
-  color: var(--gold);
+  color: var(--emerald);
   display: inline-flex;
 }
 .release-card__status-text {
@@ -892,10 +901,18 @@ html.js [data-stagger-item] {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
+  /* keep the 1fr track from re-sizing to the (changing) counter content,
+     which otherwise stutters the column widths during the count-up */
+  min-width: 0;
   transition: background 0.4s var(--ease-out);
 }
 .stat:hover {
   background: var(--ink-800);
+}
+.stat__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
 }
 .stat__num {
   display: flex;
@@ -906,6 +923,8 @@ html.js [data-stagger-item] {
   line-height: 0.9;
   letter-spacing: -0.03em;
   color: var(--fog-100);
+  /* equal-width digits so the number doesn't reflow each counter tick */
+  font-variant-numeric: tabular-nums;
 }
 .stat__suffix {
   color: var(--gold);
@@ -943,9 +962,10 @@ html.js [data-stagger-item] {
 .tech__block {
   width: 92px;
   height: 92px;
-  border-radius: 12px;
+  border-radius: 16px;
   border: 1px solid var(--line-strong);
-  background: var(--ink-700);
+  background: var(--ink-850);
+  box-shadow: 0 16px 38px -26px rgba(15, 42, 76, 0.3);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -956,7 +976,7 @@ html.js [data-stagger-item] {
   font-family: var(--font-display);
   font-size: 0.78rem;
   letter-spacing: 0.1em;
-  color: var(--gold);
+  color: var(--fog-100);
 }
 .tech__block-hex {
   font-family: var(--font-display);
@@ -966,7 +986,7 @@ html.js [data-stagger-item] {
 .tech__link {
   width: 28px;
   height: 2px;
-  background: var(--gold-deep);
+  background: var(--emerald);
   transform-origin: left center;
 }
 /* stack the chain + connecting line vertically on phones so it never wraps;
@@ -1178,8 +1198,8 @@ html.js [data-stagger-item] {
   transition: color 0.3s, border-color 0.3s;
 }
 .cta__email:hover {
-  color: var(--gold);
-  border-color: var(--gold);
+  color: var(--cobalt);
+  border-color: var(--cobalt);
 }
 
 /* ---------------------------------------------------------- *
@@ -1239,7 +1259,7 @@ html.js [data-stagger-item] {
   transition: color 0.3s;
 }
 .footer__link:hover {
-  color: var(--gold);
+  color: var(--cobalt);
 }
 .footer__address {
   display: flex;
@@ -1279,11 +1299,11 @@ html.js [data-stagger-item] {
   transition: transform 0.4s var(--ease-out), border-color 0.3s;
 }
 .footer__totop:hover {
-  color: var(--gold);
+  color: var(--cobalt);
 }
 .footer__totop:hover span {
   transform: translateY(-4px);
-  border-color: var(--gold);
+  border-color: var(--cobalt);
 }
 .footer__bar {
   display: flex;
