@@ -336,12 +336,11 @@ export default class PortYardScene {
         size -= 2
         ctx.font = `700 ${size}px 'Space Grotesk','Inter',sans-serif`
       }
-      // the camera-facing long side samples the texture flipped in both U and V,
-      // so pre-mirror the name on both axes (180°) to make it read upright and
-      // left-to-right in the yard
+      // the camera-facing long side samples the texture flipped vertically, so
+      // pre-flip the name in V to make it read upright (and the right way round)
       ctx.save()
-      ctx.translate(w, h)
-      ctx.scale(-1, -1)
+      ctx.translate(0, h)
+      ctx.scale(1, -1)
       ctx.fillStyle = carrier.nameColor
       ctx.globalAlpha = 0.85
       ctx.fillText(name, w / 2, h * 0.5)
