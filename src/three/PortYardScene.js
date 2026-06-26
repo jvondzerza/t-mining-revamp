@@ -1,6 +1,10 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import containerUrl from '../assets/container.glb?url'
+import mscLogo from '../assets/logos/msc.svg?url'
+import cmaLogo from '../assets/logos/cma-cgm.svg?url'
+import hapagLogo from '../assets/logos/hapag-lloyd.svg?url'
+import dpLogo from '../assets/logos/dp-world.svg?url'
 
 /* ------------------------------------------------------------------ *
  * PortYardScene — Concept "Instanced port-yard".
@@ -98,18 +102,23 @@ export default class PortYardScene {
   }
 
   _loadModel() {
+    const logosP = this._loadLogos()
     new GLTFLoader().load(
       containerUrl,
       (gltf) => {
         if (this._disposed) return
-        try {
-          const parts = this._prepareModel(gltf)
-          const layout = this._computeLayout(CL, parts.H, parts.D)
-          this._buildYard(parts, layout)
-        } catch (err) {
-          if (import.meta.env.DEV) console.warn('[PortYard] model build failed:', err?.message)
-          this._buildFallbackYard()
-        }
+        logosP.then((logos) => {
+          if (this._disposed) return
+          try {
+            this._logos = logos
+            const parts = this._prepareModel(gltf)
+            const layout = this._computeLayout(CL, parts.H, parts.D)
+            this._buildYard(parts, layout)
+          } catch (err) {
+            if (import.meta.env.DEV) console.warn('[PortYard] model build failed:', err?.message)
+            this._buildFallbackYard()
+          }
+        })
       },
       undefined,
       (err) => {
@@ -117,6 +126,34 @@ export default class PortYardScene {
         if (import.meta.env.DEV) console.warn('[PortYard] glb load failed, using boxes:', err?.message)
         this._buildFallbackYard()
       }
+    )
+  }
+
+  // preload each carrier's logo as an <img> + parse its aspect ratio from the
+  // SVG viewBox (so it never distorts). Missing/failed logos resolve to null
+  // and the bake falls back to the carrier's name in text.
+  _loadLogos() {
+    return Promise.all(
+      CARRIERS.map((c) => {
+        if (!c.logo) return Promise.resolve(null)
+        return fetch(c.logo)
+          .then((r) => r.text())
+          .then((txt) => {
+            let aspect = 4
+            const vb = txt.match(/viewBox\s*=\s*["']([-\d.\s,]+)["']/)
+            if (vb) {
+              const p = vb[1].trim().split(/[\s,]+/).map(Number)
+              if (p[2] > 0 && p[3] > 0) aspect = p[2] / p[3]
+            }
+            return new Promise((resolve) => {
+              const img = new Image()
+              img.onload = () => resolve({ img, aspect })
+              img.onerror = () => resolve(null)
+              img.src = c.logo
+            })
+          })
+          .catch(() => null)
+      })
     )
   }
 
@@ -217,8 +254,8 @@ export default class PortYardScene {
       if (!items.length) return
       const carrier = CARRIERS[ci]
       const skins = [
-        [front.geometry, this._bakeTexture(front, carrier, false)],
-        [sides.geometry, this._bakeTexture(sides, carrier, true)],
+        [front.geometry, this._bakeTexture(front, carrier, {})],
+        [sides.geometry, this._bakeTexture(sides, carrier, { mark: true, logo: this._logos?.[ci] })],
       ]
       skins.forEach(([geometry, tex]) => {
         const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.82, metalness: 0.04 })
@@ -301,8 +338,9 @@ export default class PortYardScene {
   }
 
   // bake a per-carrier texture: recolour the red source by remapping its
-  // luminance onto the carrier livery colour, then stencil the carrier name
-  _bakeTexture(part, carrier, withName) {
+  // luminance onto the carrier livery colour, then mark the long side with the
+  // carrier's logo (or its name as a fallback)
+  _bakeTexture(part, carrier, { mark = false, logo = null } = {}) {
     const img = part.image
     const w = img.width
     const h = img.height
@@ -325,25 +363,47 @@ export default class PortYardScene {
     }
     ctx.putImageData(id, 0, 0)
 
-    // stencil the carrier name across the long side
-    if (withName && carrier.name) {
-      const name = carrier.name.toUpperCase()
-      let size = Math.round(h * 0.3)
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-      ctx.font = `700 ${size}px 'Space Grotesk','Inter',sans-serif`
-      while (ctx.measureText(name).width > w * 0.66 && size > 8) {
-        size -= 2
-        ctx.font = `700 ${size}px 'Space Grotesk','Inter',sans-serif`
-      }
-      // the camera-facing long side samples the texture flipped vertically, so
-      // pre-flip the name in V to make it read upright (and the right way round)
+    // mark the long side. The camera-facing face samples the texture flipped in
+    // V, so everything below is drawn under a vertical flip to read upright.
+    if (mark && (logo || carrier.name)) {
       ctx.save()
       ctx.translate(0, h)
       ctx.scale(1, -1)
-      ctx.fillStyle = carrier.nameColor
-      ctx.globalAlpha = 0.85
-      ctx.fillText(name, w / 2, h * 0.5)
+      ctx.globalAlpha = 0.9
+      if (logo && logo.img) {
+        // fit the logo, then recolour it to a single livery-readable tone
+        const maxW = w * 0.74
+        const maxH = h * 0.66
+        let dw = maxW
+        let dh = dw / logo.aspect
+        if (dh > maxH) {
+          dh = maxH
+          dw = dh * logo.aspect
+        }
+        const tw = Math.max(1, Math.round(dw))
+        const th = Math.max(1, Math.round(dh))
+        const tmp = document.createElement('canvas')
+        tmp.width = tw
+        tmp.height = th
+        const tctx = tmp.getContext('2d')
+        tctx.drawImage(logo.img, 0, 0, tw, th)
+        tctx.globalCompositeOperation = 'source-in' // tint opaque pixels only
+        tctx.fillStyle = carrier.nameColor || '#ffffff'
+        tctx.fillRect(0, 0, tw, th)
+        ctx.drawImage(tmp, (w - dw) / 2, (h - dh) / 2, dw, dh)
+      } else {
+        const name = carrier.name.toUpperCase()
+        let size = Math.round(h * 0.3)
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.font = `700 ${size}px 'Space Grotesk','Inter',sans-serif`
+        while (ctx.measureText(name).width > w * 0.66 && size > 8) {
+          size -= 2
+          ctx.font = `700 ${size}px 'Space Grotesk','Inter',sans-serif`
+        }
+        ctx.fillStyle = carrier.nameColor
+        ctx.fillText(name, w / 2, h * 0.5)
+      }
       ctx.restore()
     }
 
@@ -428,11 +488,11 @@ export default class PortYardScene {
 // dark ones). Weighted by how common each operator's boxes are. (The other
 // marquee names are ports/platforms/roles with no container livery.)
 const CARRIERS = [
-  { name: 'MSC', hex: '#e0a92e', nameColor: '#2a3140', w: 4 }, // mustard gold
-  { name: 'CMA CGM', hex: '#3f7cc2', nameColor: '#ffffff', w: 4 }, // mid blue
-  { name: 'Hapag-Lloyd', hex: '#e8631a', nameColor: '#2a1a10', w: 3 }, // orange
-  { name: 'DP World', hex: '#1b4a86', nameColor: '#ffffff', w: 3 }, // navy
-  { name: null, hex: '#9aa4ae', nameColor: null, w: 4 }, // generic / leased grey
+  { name: 'MSC', hex: '#e0a92e', nameColor: '#2a3140', logo: mscLogo, w: 4 }, // mustard gold
+  { name: 'CMA CGM', hex: '#3f7cc2', nameColor: '#ffffff', logo: cmaLogo, w: 4 }, // mid blue
+  { name: 'Hapag-Lloyd', hex: '#e8631a', nameColor: '#2a1a10', logo: hapagLogo, w: 3 }, // orange
+  { name: 'DP World', hex: '#1b4a86', nameColor: '#ffffff', logo: dpLogo, w: 3 }, // navy
+  { name: null, hex: '#9aa4ae', nameColor: null, logo: null, w: 4 }, // generic / leased grey
 ]
 CARRIERS.forEach((c) => {
   c.rgb = hexToRgb(c.hex)
