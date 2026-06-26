@@ -6,11 +6,12 @@ import containerUrl from '../assets/container.glb?url'
  * PortYardScene — Concept "Instanced port-yard".
  * A low 3/4 view across an endless, fog-faded field of stacked shipping
  * containers. A single low-poly container model (super_low_poly_container
- * .glb) is GPU-instanced thousands of times in two draw calls (its doors
- * + its sides), and each instance is repainted in a real carrier's livery
- * (MSC, CMA CGM, Hapag-Lloyd, DP World — the container operators from the
- * marquee) by remapping the red texture's shading onto the carrier colour.
- * A warm light-sweep crosses the yard.
+ * .glb) is GPU-instanced thousands of times, grouped by carrier so each
+ * group wears a real livery — MSC, CMA CGM, Hapag-Lloyd and DP World (the
+ * container operators from the marquee), plus neutral grey for generic /
+ * leased boxes. Each carrier's textures are baked once: the red source is
+ * recoloured to the livery and the side gets the carrier name stencilled
+ * on. A warm light-sweep crosses the yard.
  *
  * Drop-in replacement for GlobeScene: same public interface
  * (constructor(canvas, { mobile }), setPointer, pause, resume, dispose).
@@ -144,16 +145,28 @@ export default class PortYardScene {
     const D = widthRaw * s
     const rotate = size.z >= size.x // model's long axis is Z → turn it onto X
 
-    const baked = meshes.map((m) => {
+    // classify the two primitives by their texture aspect: the wide one is the
+    // long corrugated side (gets the carrier name), the squarer one is the doors
+    let front = null
+    let sides = null
+    this._sourceTextures = []
+    meshes.forEach((m) => {
       const g = m.geometry.clone().applyMatrix4(m.matrixWorld)
       if (rotate) g.rotateY(Math.PI / 2)
       g.scale(s, s, s)
       g.translate(0, H / 2, 0) // sit the base on the ground for clean stacking
       g.computeVertexNormals()
-      return { geometry: g, material: m.material }
+      const tex = m.material.map
+      const img = tex?.image
+      if (tex) this._sourceTextures.push(tex)
+      const part = { geometry: g, image: img, flipY: tex ? tex.flipY : false }
+      if (img && img.width / img.height >= 2) sides = part
+      else front = part
     })
+    if (!front) front = sides
+    if (!sides) sides = front
 
-    return { parts: baked, H, D }
+    return { front, sides, H, D }
   }
 
   _computeLayout(L, H, D) {
@@ -187,41 +200,50 @@ export default class PortYardScene {
     return { inst }
   }
 
-  _buildYard({ parts }, { inst }) {
-    const count = inst.length
-
-    // per-instance carrier colour (one red model → a real-livery fleet)
-    const aCarrier = new Float32Array(count * 3)
+  _buildYard({ front, sides }, { inst }) {
+    // assign each stack-box a carrier, grouped so we can bake one texture set
+    // per carrier (livery colour + stencilled name) and instance them together
     const rand = mulberry32(1337)
-    const c = new THREE.Color()
-    for (let i = 0; i < count; i++) {
-      pickCarrier(rand, c)
-      aCarrier[i * 3] = c.r
-      aCarrier[i * 3 + 1] = c.g
-      aCarrier[i * 3 + 2] = c.b
-    }
+    const groups = CARRIERS.map(() => [])
+    inst.forEach((it) => groups[pickCarrierIndex(rand)].push(it))
 
     const m = new THREE.Matrix4()
     const q = new THREE.Quaternion()
     const scl = new THREE.Vector3(1, 1, 1)
     const pos = new THREE.Vector3()
+    const weather = new THREE.Color()
 
-    parts.forEach(({ geometry, material }) => {
-      geometry.setAttribute('aCarrier', new THREE.InstancedBufferAttribute(aCarrier, 3))
-      this._patchMaterial(material)
-
-      const mesh = new THREE.InstancedMesh(geometry, material, count)
-      mesh.instanceMatrix.setUsage(THREE.StaticDrawUsage)
-      inst.forEach((it, i) => {
-        pos.set(it.x, it.y, it.z)
-        m.compose(pos, q, scl)
-        mesh.setMatrixAt(i, m)
+    groups.forEach((items, ci) => {
+      if (!items.length) return
+      const carrier = CARRIERS[ci]
+      const skins = [
+        [front.geometry, this._bakeTexture(front, carrier, false)],
+        [sides.geometry, this._bakeTexture(sides, carrier, true)],
+      ]
+      skins.forEach(([geometry, tex]) => {
+        const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.82, metalness: 0.04 })
+        this._patchSweepOnly(mat)
+        const mesh = new THREE.InstancedMesh(geometry, mat, items.length)
+        mesh.instanceMatrix.setUsage(THREE.StaticDrawUsage)
+        items.forEach((it, i) => {
+          pos.set(it.x, it.y, it.z)
+          m.compose(pos, q, scl)
+          mesh.setMatrixAt(i, m)
+          const v = 0.86 + rand() * 0.2 // subtle per-box weathering
+          weather.setRGB(v, v, v)
+          mesh.setColorAt(i, weather)
+        })
+        mesh.instanceMatrix.needsUpdate = true
+        if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
+        mesh.frustumCulled = false
+        this.scene.add(mesh)
+        this.yardMeshes.push(mesh)
       })
-      mesh.instanceMatrix.needsUpdate = true
-      mesh.frustumCulled = false
-      this.scene.add(mesh)
-      this.yardMeshes.push(mesh)
     })
+
+    // the raw red source textures aren't needed once the liveries are baked
+    this._sourceTextures?.forEach((t) => t.dispose())
+    this._sourceTextures = null
   }
 
   // box-geometry fallback (only if the glb fails to load) — recoloured per
@@ -247,7 +269,8 @@ export default class PortYardScene {
       pos.set(it.x, it.y + H / 2, it.z)
       m.compose(pos, q, scl)
       mesh.setMatrixAt(i, m)
-      pickCarrier(rand, col)
+      const carrier = CARRIERS[pickCarrierIndex(rand)]
+      col.set(carrier.hex).multiplyScalar(0.85 + rand() * 0.2)
       mesh.setColorAt(i, col)
     })
     mesh.instanceMatrix.needsUpdate = true
@@ -255,50 +278,6 @@ export default class PortYardScene {
     mesh.frustumCulled = false
     this.scene.add(mesh)
     this.yardMeshes.push(mesh)
-  }
-
-  // inject the per-instance carrier-livery recolour + the travelling light-sweep
-  _patchMaterial(mat) {
-    mat.onBeforeCompile = (shader) => {
-      shader.uniforms.uSweep = this.uSweep
-      shader.uniforms.uSweepColor = this.uSweepColor
-      shader.vertexShader = shader.vertexShader
-        .replace(
-          '#include <common>',
-          `#include <common>
-           attribute vec3 aCarrier;
-           varying vec3 vWPos; varying vec3 vCarrier;`
-        )
-        .replace(
-          '#include <begin_vertex>',
-          `#include <begin_vertex>
-           vWPos = (modelMatrix * instanceMatrix * vec4(transformed, 1.0)).xyz;
-           vCarrier = aCarrier;`
-        )
-      shader.fragmentShader = shader.fragmentShader
-        .replace(
-          '#include <common>',
-          `#include <common>
-           uniform float uSweep; uniform vec3 uSweepColor;
-           varying vec3 vWPos; varying vec3 vCarrier;`
-        )
-        .replace(
-          '#include <map_fragment>',
-          `#include <map_fragment>
-           {
-             // remap the red texture's shading onto the carrier livery colour
-             float shade = dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114));
-             diffuseColor.rgb = clamp(vCarrier * (0.18 + shade * 4.2), 0.0, 1.0);
-           }`
-        )
-        .replace(
-          '#include <emissivemap_fragment>',
-          `#include <emissivemap_fragment>
-           float sw = smoothstep(3.5, 0.0, abs(vWPos.x - uSweep));
-           totalEmissiveRadiance += uSweepColor * sw * sw * 0.5;`
-        )
-    }
-    mat.needsUpdate = true
   }
 
   _patchSweepOnly(mat) {
@@ -319,6 +298,61 @@ export default class PortYardScene {
         )
     }
     mat.needsUpdate = true
+  }
+
+  // bake a per-carrier texture: recolour the red source by remapping its
+  // luminance onto the carrier livery colour, then stencil the carrier name
+  _bakeTexture(part, carrier, withName) {
+    const img = part.image
+    const w = img.width
+    const h = img.height
+    const cv = document.createElement('canvas')
+    cv.width = w
+    cv.height = h
+    const ctx = cv.getContext('2d')
+    ctx.drawImage(img, 0, 0, w, h)
+
+    // recolour: source luminance → carrier colour (keeps corrugation + shading)
+    const id = ctx.getImageData(0, 0, w, h)
+    const d = id.data
+    const [cr, cg, cb] = carrier.rgb
+    for (let i = 0; i < d.length; i += 4) {
+      const lum = (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]) / 255
+      const f = Math.min(1.25, 0.32 + lum * 1.9)
+      d[i] = Math.min(255, cr * f)
+      d[i + 1] = Math.min(255, cg * f)
+      d[i + 2] = Math.min(255, cb * f)
+    }
+    ctx.putImageData(id, 0, 0)
+
+    // stencil the carrier name across the long side
+    if (withName && carrier.name) {
+      const name = carrier.name.toUpperCase()
+      let size = Math.round(h * 0.3)
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.font = `700 ${size}px 'Space Grotesk','Inter',sans-serif`
+      while (ctx.measureText(name).width > w * 0.66 && size > 8) {
+        size -= 2
+        ctx.font = `700 ${size}px 'Space Grotesk','Inter',sans-serif`
+      }
+      // the camera-facing long side samples the texture mirrored in U, so
+      // pre-mirror the name here to make it read left-to-right in the yard
+      ctx.save()
+      ctx.translate(w, 0)
+      ctx.scale(-1, 1)
+      ctx.fillStyle = carrier.nameColor
+      ctx.globalAlpha = 0.85
+      ctx.fillText(name, w / 2, h * 0.5)
+      ctx.restore()
+    }
+
+    const tex = new THREE.CanvasTexture(cv)
+    tex.flipY = part.flipY // match the glTF UV orientation
+    tex.colorSpace = THREE.SRGBColorSpace
+    tex.anisotropy = 4
+    tex.needsUpdate = true
+    return tex
   }
 
   setPointer(nx, ny) {
@@ -388,29 +422,36 @@ export default class PortYardScene {
 
 /* ---------- helpers ---------- */
 
-// real carrier liveries — only the marquee entries that run branded container
-// fleets, each weighted by how common their boxes are. (The other marquee
-// names are ports/platforms/roles with no container livery of their own.)
+// real carrier liveries — the marquee entries that run branded container
+// fleets, plus a neutral grey for the generic/leased boxes every yard has.
+// `nameColor` is the stencilled name colour (dark on light liveries, light on
+// dark ones). Weighted by how common each operator's boxes are. (The other
+// marquee names are ports/platforms/roles with no container livery.)
 const CARRIERS = [
-  { name: 'MSC', color: new THREE.Color('#e0a92e'), w: 4 }, // mustard gold
-  { name: 'CMA CGM', color: new THREE.Color('#3f7cc2'), w: 4 }, // mid blue
-  { name: 'Hapag-Lloyd', color: new THREE.Color('#e8631a'), w: 3 }, // orange
-  { name: 'DP World', color: new THREE.Color('#1b4a86'), w: 2 }, // navy
+  { name: 'MSC', hex: '#e0a92e', nameColor: '#2a3140', w: 4 }, // mustard gold
+  { name: 'CMA CGM', hex: '#3f7cc2', nameColor: '#ffffff', w: 4 }, // mid blue
+  { name: 'Hapag-Lloyd', hex: '#e8631a', nameColor: '#2a1a10', w: 3 }, // orange
+  { name: 'DP World', hex: '#1b4a86', nameColor: '#ffffff', w: 3 }, // navy
+  { name: null, hex: '#9aa4ae', nameColor: null, w: 4 }, // generic / leased grey
 ]
+CARRIERS.forEach((c) => {
+  c.rgb = hexToRgb(c.hex)
+})
 const CARRIER_TOTAL = CARRIERS.reduce((a, b) => a + b.w, 0)
 
-// pick a weighted carrier colour (with a touch of per-box weathering) into `out`
-function pickCarrier(rand, out) {
+function hexToRgb(hex) {
+  const n = parseInt(hex.slice(1), 16)
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
+}
+
+// pick a weighted carrier index
+function pickCarrierIndex(rand) {
   let r = rand() * CARRIER_TOTAL
-  let row = CARRIERS[0]
-  for (const e of CARRIERS) {
-    if (r < e.w) {
-      row = e
-      break
-    }
-    r -= e.w
+  for (let i = 0; i < CARRIERS.length; i++) {
+    if (r < CARRIERS[i].w) return i
+    r -= CARRIERS[i].w
   }
-  return out.copy(row.color).multiplyScalar(0.9 + rand() * 0.16)
+  return 0
 }
 
 // deterministic PRNG so the yard layout + colours are stable across reloads
