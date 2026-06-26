@@ -470,9 +470,6 @@ html.js .threat__risk-content {
 @keyframes marqueeScroll {
   to { transform: translateX(-50%); }
 }
-.marquee:hover .marquee__track {
-  animation-play-state: paused;
-}
 
 /* ---------------------------------------------------------- *
    MISSION

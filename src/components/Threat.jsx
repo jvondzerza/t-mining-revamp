@@ -45,16 +45,15 @@ export default function Threat() {
         }
       )
 
-      // animate only the content of each risk — the cells + dividers stay put
+      // reveal the whole panel as one element
       gsap.fromTo(
-        '.threat__risk-content',
+        '.threat__right',
         { x: 28, autoAlpha: 0 },
         {
           x: 0,
           autoAlpha: 1,
           duration: 0.9,
           ease: 'power3.out',
-          stagger: 0.12,
           scrollTrigger: { trigger: '.threat__right', start: 'top 82%' },
         }
       )
