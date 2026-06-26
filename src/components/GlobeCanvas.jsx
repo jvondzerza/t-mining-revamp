@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
-import GlobeScene from '../three/GlobeScene'
+// Hero concept: "The seal" — drop-in replacement for GlobeScene
+import GlobeScene from '../three/LinkSealScene'
 
 export default function GlobeCanvas() {
   const canvasRef = useRef(null)
