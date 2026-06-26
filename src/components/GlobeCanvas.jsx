@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
-import GlobeScene from '../three/GlobeScene'
+// Hero concept: "Matter, digitized" — drop-in replacement for GlobeScene
+import GlobeScene from '../three/ParticleMorphScene'
 
 export default function GlobeCanvas() {
   const canvasRef = useRef(null)
