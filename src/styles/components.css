@@ -628,6 +628,11 @@ html.js .threat__risk-content {
   gap: clamp(2rem, 6vw, 6rem);
   align-items: start;
 }
+/* the stage is transparent on desktop (card + steps are the two grid columns);
+   on mobile it becomes the single pinned element that holds both */
+.solution__stage {
+  display: contents;
+}
 .solution__visual {
   position: sticky;
   top: 18vh;
@@ -1359,24 +1364,24 @@ html.js .threat__risk-content {
   .technology__grid {
     grid-template-columns: 1fr;
   }
-  /* mobile: keep the card sticky so the scroll-step animation still plays — the
-     card pins near the top and the steps scroll through the band below it.
-     Use block flow (not a 1-col grid) so the card can stick across the whole
-     section rather than being confined to its short grid row. */
+  /* mobile: pin the card + a step slot together as one stage, and crossfade the
+     active step in that slot. Nothing scrolls behind the card — scrolling just
+     scrubs which step is shown, driving the card's progress animation. */
   .solution__grid {
     display: block;
+    min-height: 220vh; /* scroll runway to scrub the 4 steps */
   }
-  .solution__visual {
+  .solution__stage {
+    display: block;
     position: sticky;
-    top: clamp(72px, 11vh, 96px);
+    top: clamp(72px, 10vh, 92px);
     max-width: 460px;
     margin-inline: auto;
-    z-index: 2;
   }
-  .solution__steps {
-    max-width: 460px;
-    margin-inline: auto;
-    margin-top: clamp(1.6rem, 5vw, 2.6rem);
+  /* the stage does the pinning now — the card itself is a normal block inside it
+     (reset the desktop sticky so it occupies its full height) */
+  .solution__visual {
+    position: static;
   }
   .release-card {
     padding: 1.5rem;
@@ -1389,6 +1394,24 @@ html.js .threat__risk-content {
   }
   .release-card__status {
     margin-top: 1.8rem;
+  }
+  /* the steps share one slot below the card and crossfade between each other */
+  .solution__steps {
+    position: relative;
+    display: block;
+    margin-top: clamp(1.4rem, 4vw, 2rem);
+    min-height: 250px;
+  }
+  .solution__step {
+    position: absolute;
+    inset: 0;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+    transition: opacity 0.45s var(--ease-out);
+  }
+  .solution__step.is-active {
+    opacity: 1;
   }
   .pillars__grid,
   .insights__grid {

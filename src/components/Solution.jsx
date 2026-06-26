@@ -36,18 +36,25 @@ export default function Solution() {
     const ctx = gsap.context(() => {
       const steps = gsap.utils.toArray('.solution__step')
       const grid = root.current.querySelector('.solution__grid')
+      const stage = root.current.querySelector('.solution__stage')
       const card = root.current.querySelector('.release-card')
 
-      // The active step is the one whose centre is closest to the card's centre
-      // line, so the card updates as it lines up with the middle of each step.
-      // Desktop: the card sits beside the steps (centre ≈ top:18vh + half its
-      // height). Mobile: the card is pinned at the top and the steps scroll
-      // through the band below it, so we target a point in the lower viewport.
+      // Desktop: the card sits beside the steps, so the active step is the one
+      // whose centre lines up with the card's centre (top:18vh + half its
+      // height). Mobile: the card + a step slot are pinned together as one
+      // stage and the active step crossfades in place, so we derive it from how
+      // far we've scrubbed through the section's pinned range.
       const pickActive = () => {
         const mobile = window.matchMedia('(max-width: 1024px)').matches
-        const cardLine = mobile
-          ? window.innerHeight * 0.6
-          : window.innerHeight * 0.18 + (card?.offsetHeight || 0) / 2
+        if (mobile) {
+          const pinTop = parseFloat(getComputedStyle(stage).top) || 80
+          const pinDist = grid.offsetHeight - stage.offsetHeight
+          const scrolled = pinTop - grid.getBoundingClientRect().top
+          const p = pinDist > 0 ? Math.min(1, Math.max(0, scrolled / pinDist)) : 0
+          setActive(Math.min(STEPS.length - 1, Math.floor(p * STEPS.length)))
+          return
+        }
+        const cardLine = window.innerHeight * 0.18 + (card?.offsetHeight || 0) / 2
         let best = 0
         let bestDist = Infinity
         steps.forEach((step, i) => {
@@ -90,6 +97,7 @@ export default function Solution() {
         </header>
 
         <div className="solution__grid">
+          <div className="solution__stage">
           {/* sticky visual */}
           <div className="solution__visual">
             <div className="release-card" data-active={STEPS[active].k}>
@@ -145,6 +153,7 @@ export default function Solution() {
               </li>
             ))}
           </ol>
+          </div>
         </div>
       </div>
     </section>
