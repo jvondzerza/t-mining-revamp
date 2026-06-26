@@ -9,7 +9,7 @@
 html.js [data-reveal='up'],
 html.js [data-stagger-item],
 html.js .stat__content,
-html.js .threat__risk-content {
+html.js .threat__right {
   opacity: 0;
 }
 .mask {
@@ -25,7 +25,7 @@ html.js .threat__risk-content {
   html.js [data-reveal='up'],
   html.js [data-stagger-item],
   html.js .stat__content,
-  html.js .threat__risk-content {
+  html.js .threat__right {
     opacity: 1 !important;
   }
 }
