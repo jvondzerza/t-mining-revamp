@@ -35,14 +35,36 @@ export default function Solution() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       const steps = gsap.utils.toArray('.solution__step')
-      steps.forEach((step, i) => {
-        ScrollTrigger.create({
-          trigger: step,
-          start: 'top 60%',
-          end: 'bottom 60%',
-          onToggle: (self) => self.isActive && setActive(i),
+      const grid = root.current.querySelector('.solution__grid')
+      const card = root.current.querySelector('.release-card')
+
+      // The active step is the one whose centre is closest to the sticky card's
+      // centre line (top:18vh + half the card height) — so the card updates as it
+      // lines up with the middle of each step, not its top.
+      const pickActive = () => {
+        const cardLine = window.innerHeight * 0.18 + (card?.offsetHeight || 0) / 2
+        let best = 0
+        let bestDist = Infinity
+        steps.forEach((step, i) => {
+          const r = step.getBoundingClientRect()
+          const dist = Math.abs(r.top + r.height / 2 - cardLine)
+          if (dist < bestDist) {
+            bestDist = dist
+            best = i
+          }
         })
+        setActive(best)
+      }
+
+      const st = ScrollTrigger.create({
+        trigger: grid,
+        start: 'top bottom',
+        end: 'bottom top',
+        onUpdate: pickActive,
+        onRefresh: pickActive,
       })
+      pickActive()
+      return () => st.kill()
     }, root)
     return () => ctx.revert()
   }, [])
