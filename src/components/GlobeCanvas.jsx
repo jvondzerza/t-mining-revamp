@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
-import GlobeScene from '../three/GlobeScene'
+// Hero concept: "Instanced port-yard" — drop-in replacement for GlobeScene
+import GlobeScene from '../three/PortYardScene'
 
 export default function GlobeCanvas() {
   const canvasRef = useRef(null)

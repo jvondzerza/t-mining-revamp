@@ -45,20 +45,29 @@ export default function Threat() {
         }
       )
 
-      // animate only the content of each risk — the cells + dividers stay put
-      gsap.fromTo(
-        '.threat__risk-content',
-        { x: 28, autoAlpha: 0 },
-        {
-          x: 0,
-          autoAlpha: 1,
-          duration: 0.9,
-          ease: 'power3.out',
-          stagger: 0.12,
-          scrollTrigger: { trigger: '.threat__right', start: 'top 82%' },
-        }
-      )
-      return () => tween && tween.kill()
+      // reveal the whole panel as one element — in from the side on desktop,
+      // up from below on mobile
+      const mm = gsap.matchMedia()
+      const reveal = (from) =>
+        gsap.fromTo(
+          '.threat__right',
+          { ...from, autoAlpha: 0 },
+          {
+            x: 0,
+            y: 0,
+            autoAlpha: 1,
+            duration: 0.9,
+            ease: 'power3.out',
+            scrollTrigger: { trigger: '.threat__right', start: 'top 82%' },
+          }
+        )
+      mm.add('(min-width: 1025px)', () => reveal({ x: 28 }))
+      mm.add('(max-width: 1024px)', () => reveal({ y: 28 }))
+
+      return () => {
+        tween && tween.kill()
+        mm.revert()
+      }
     }, root)
     return () => ctx.revert()
   }, [])

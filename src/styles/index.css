@@ -3,11 +3,12 @@
    ============================================================ */
 
 :root {
-  /* — Core palette: maritime blues + emerald on crisp white, gold retained — */
-  --navy: #0f2a4c; /* deep base — headings, primary buttons, globe */
-  --cobalt: #2456e6; /* vivid interactive blue — links, arcs, hovers */
-  --sapphire: #0f52ba; /* deeper blue — the threat / serious states */
-  --emerald: #0f9d76; /* "secure / verified" success accent */
+  /* — Core palette: navy + container-drawn blue & orange, gold retained — */
+  --navy: #0f2a4c; /* deep base — headings, primary buttons */
+  --azure: #2f7fd1; /* light container blue — interactive + verified accents */
+  --azure-deep: #1e63b4; /* deeper azure for text/links on white (contrast) */
+  --ember: #e8631a; /* container orange — alert / the threat states */
+  --ember-deep: #c2510f; /* deeper ember for text on white (contrast) */
   --charcoal: #33414b; /* charcoal grey — body text */
 
   /* surfaces — crisp white running to cool light */
@@ -234,7 +235,7 @@ h4 {
   border-color: var(--fog-100);
 }
 .btn--primary::before {
-  background: var(--cobalt);
+  background: var(--azure);
 }
 .btn--primary:hover {
   color: var(--ink-850);
@@ -250,10 +251,10 @@ h4 {
   font-size: 0.72rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--fog-300);
+  color: var(--ink-850);
   border: 1px solid var(--line);
   border-radius: 100px;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--ember-deep);
 }
 .tag .dot {
   width: 6px;
