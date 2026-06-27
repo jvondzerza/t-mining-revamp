@@ -1,26 +1,10 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from '../lib/gsap'
-
-const FEATURES = [
-  {
-    k: 'Blockchain',
-    title: 'A shared source of truth',
-    body: 'A distributed ledger every party can verify and none can quietly rewrite. The history of a container is tamper-evident by construction.',
-  },
-  {
-    k: 'ID Wallet',
-    title: 'Identity you actually own',
-    body: 'Self-sovereign digital identity lets a driver or company prove exactly who they are — without handing over a pile of private data to do it.',
-  },
-  {
-    k: 'Decentralized',
-    title: 'No honeypot to breach',
-    body: 'There is no central vault of commercial secrets for attackers to target, and no single point of failure to take the network down.',
-  },
-]
+import { useT } from '../i18n'
 
 export default function Technology() {
   const root = useRef(null)
+  const t = useT()
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -58,16 +42,9 @@ export default function Technology() {
     <section className="section technology" id="technology" ref={root}>
       <div className="container technology__grid">
         <div className="technology__left">
-          <span className="eyebrow" data-reveal="up">The technology</span>
-          <h2 className="section-title" data-reveal="up">
-            Trust, without a middleman.
-          </h2>
-          <p className="lead technology__lead" data-reveal="up">
-            Our solutions run on decentralized technology — blockchain and verifiable
-            digital identity. The right to a container becomes a token only its true
-            owner can hold, and identity is proven without ever exposing what should
-            stay private.
-          </p>
+          <span className="eyebrow" data-reveal="up">{t.technology.eyebrow}</span>
+          <h2 className="section-title" data-reveal="up">{t.technology.title}</h2>
+          <p className="lead technology__lead" data-reveal="up">{t.technology.lead}</p>
 
           <div className="tech__chain" aria-hidden="true">
             {['HASH', 'OWNER', 'SIGN', 'LOG'].map((b, i) => (
@@ -83,7 +60,7 @@ export default function Technology() {
         </div>
 
         <div className="technology__right" data-reveal="stagger">
-          {FEATURES.map((f) => (
+          {t.technology.features.map((f) => (
             <article className="tech__feature" key={f.k} data-stagger-item>
               <span className="tech__feature-k">{f.k}</span>
               <h3 className="tech__feature-title">{f.title}</h3>

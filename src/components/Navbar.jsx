@@ -1,15 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from '../lib/gsap'
+import { useI18n } from '../i18n'
+import LanguageSwitcher from './LanguageSwitcher'
 
-const LINKS = [
-  { label: 'Solution', href: '#solution' },
-  { label: 'Why it matters', href: '#pillars' },
-  { label: 'Network', href: '#network' },
-  { label: 'Technology', href: '#technology' },
-  { label: 'Insights', href: '#insights' },
-]
+const HREFS = ['#solution', '#pillars', '#network', '#technology', '#insights']
 
 export default function Navbar() {
+  const { t } = useI18n()
   const [scrolled, setScrolled] = useState(false)
   const [hidden, setHidden] = useState(false)
   const [open, setOpen] = useState(false)
@@ -59,22 +56,23 @@ export default function Navbar() {
         </a>
 
         <nav className="nav__links" aria-label="Primary">
-          {LINKS.map((l) => (
-            <a key={l.href} href={l.href} onClick={(e) => go(e, l.href)} className="nav__link">
-              {l.label}
+          {HREFS.map((href, i) => (
+            <a key={href} href={href} onClick={(e) => go(e, href)} className="nav__link">
+              {t.nav.links[i]}
             </a>
           ))}
         </nav>
 
         <div className="nav__right">
+          <LanguageSwitcher />
           <a href="#contact" onClick={(e) => go(e, '#contact')} className="btn nav__cta">
-            Book a demo
+            {t.nav.bookDemo}
             <span className="arrow">↗</span>
           </a>
           <button
             className={`nav__burger ${open ? 'is-open' : ''}`}
             onClick={() => setOpen((v) => !v)}
-            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
             aria-expanded={open}
           >
             <span />
@@ -85,22 +83,28 @@ export default function Navbar() {
 
       <div className={`mobile-menu ${open ? 'is-open' : ''}`} ref={menuRef}>
         <nav className="mobile-menu__nav">
-          {LINKS.map((l) => (
-            <div className="mobile-menu__line" key={l.href}>
-              <a href={l.href} onClick={(e) => go(e, l.href)} className="mobile-menu__link">
-                {l.label}
+          {HREFS.map((href, i) => (
+            <div className="mobile-menu__line" key={href}>
+              <a href={href} onClick={(e) => go(e, href)} className="mobile-menu__link">
+                {t.nav.links[i]}
               </a>
             </div>
           ))}
           <div className="mobile-menu__line">
             <a href="#contact" onClick={(e) => go(e, '#contact')} className="mobile-menu__link mobile-menu__link--cta">
-              Book a demo ↗
+              {t.nav.bookDemo} ↗
             </a>
           </div>
         </nav>
+
+        <div className="mobile-menu__lang">
+          <span className="mobile-menu__lang-label">{t.nav.language}</span>
+          <LanguageSwitcher variant="inline" />
+        </div>
+
         <div className="mobile-menu__foot">
-          <span>Antwerp · Belgium</span>
-          <span>ISO 27001 : 2022</span>
+          <span>{t.nav.foot.location}</span>
+          <span>{t.nav.foot.iso}</span>
         </div>
       </div>
     </>

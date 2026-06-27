@@ -1,26 +1,19 @@
-const ITEMS = [
-  'MSC',
-  'Hapag-Lloyd',
-  'CMA CGM',
-  'Port of Antwerp-Bruges',
-  'NxtPort',
-  'DP World',
-  'Terminal Operators',
-  'Freight Forwarders',
-  'Hauliers',
-]
+import { useT } from '../i18n'
 
 export default function Marquee() {
+  const t = useT()
+  const items = t.marquee.items
+
   return (
-    <section className="marquee" aria-label="Trusted across the supply chain">
+    <section className="marquee" aria-label={t.marquee.intro}>
       <div className="marquee__intro container">
-        <span className="text-muted">Trusted across the maritime supply chain</span>
+        <span className="text-muted">{t.marquee.intro}</span>
       </div>
       <div className="marquee__viewport">
         <div className="marquee__track">
           {[0, 1].map((dup) => (
             <div className="marquee__row" key={dup} aria-hidden={dup === 1}>
-              {ITEMS.map((it) => (
+              {items.map((it) => (
                 <span className="marquee__item" key={it + dup}>
                   {it}
                   <svg viewBox="0 0 24 24" width="14" height="14" className="marquee__sep" aria-hidden="true">

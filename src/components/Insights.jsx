@@ -1,42 +1,23 @@
-const POSTS = [
-  {
-    cat: 'Insight',
-    date: 'Jun 2026',
-    title: 'Why container release fraud is really a security problem',
-    read: '6 min read',
-  },
-  {
-    cat: 'Product',
-    date: 'May 2026',
-    title: 'Self-sovereign identity arrives at the terminal gate',
-    read: '4 min read',
-  },
-  {
-    cat: 'Company',
-    date: 'Apr 2026',
-    title: 'T-Mining renews ISO 27001:2022 certification',
-    read: '3 min read',
-  },
-]
+import { useT } from '../i18n'
 
 export default function Insights() {
+  const t = useT()
+
   return (
     <section className="section insights" id="insights">
       <div className="container">
         <header className="insights__head">
           <div>
-            <span className="eyebrow" data-reveal="up">Insights</span>
-            <h2 className="section-title" data-reveal="up">
-              From the port up.
-            </h2>
+            <span className="eyebrow" data-reveal="up">{t.insights.eyebrow}</span>
+            <h2 className="section-title" data-reveal="up">{t.insights.title}</h2>
           </div>
           <a href="#" className="insights__all btn" data-reveal="up">
-            All articles <span className="arrow">↗</span>
+            {t.insights.all} <span className="arrow">↗</span>
           </a>
         </header>
 
         <div className="insights__grid" data-reveal="stagger">
-          {POSTS.map((p, i) => (
+          {t.insights.posts.map((p, i) => (
             <article className="post" key={i} data-stagger-item>
               <a href="#" className="post__link">
                 <div className="post__meta">

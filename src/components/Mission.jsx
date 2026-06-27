@@ -1,12 +1,14 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from '../lib/gsap'
-
-const TEXT =
-  'We build the networks that drive collaboration and digitization across supply chains — replacing fragile, fraud-prone processes with trusted digital identity and decentralized technology.'
+import { useT } from '../i18n'
 
 export default function Mission() {
   const root = useRef(null)
+  const t = useT()
+  const text = t.mission.text
 
+  // re-run when the copy changes (e.g. language switch) so the scrub retargets
+  // the new word spans
   useEffect(() => {
     const ctx = gsap.context(() => {
       const words = gsap.utils.toArray('.mission__word')
@@ -27,14 +29,14 @@ export default function Mission() {
       )
     }, root)
     return () => ctx.revert()
-  }, [])
+  }, [text])
 
   return (
     <section className="section mission" ref={root}>
       <div className="container">
-        <span className="eyebrow" data-reveal="up">Our mission</span>
+        <span className="eyebrow" data-reveal="up">{t.mission.eyebrow}</span>
         <p className="mission__text">
-          {TEXT.split(' ').map((w, i) => (
+          {text.split(' ').map((w, i) => (
             <span className="mission__word" key={i}>
               {w}{' '}
             </span>
