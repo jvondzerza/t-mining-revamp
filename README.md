@@ -1,6 +1,6 @@
 # T-Mining — Website Revamp (concept)
 
-An awwwards-style concept redesign of [t-mining.be](https://www.t-mining.be/) — the
+A concept redesign of [t-mining.be](https://www.t-mining.be/) — the
 Antwerp blockchain-logistics company whose **Secure Container Release** product
 replaces vulnerable PIN codes with trusted digital identity for maritime container
 release.
@@ -59,7 +59,7 @@ bars, and full keyboard/`aria`/reduced-motion support) so the user can scroll pa
 ```
 src/
   three/PortYardScene.js   # the instanced container yard (vanilla three + GLTFLoader)
-  components/              # Hero, GlobeCanvas (mount), ErrorBoundary, Navbar, Preloader, sections…
+  components/              # Hero, HeroCanvas (mount), ErrorBoundary, Navbar, Preloader, sections…
   hooks/                  # useSmoothScroll (Lenis↔GSAP), useReveal (scroll reveals)
   lib/gsap.js             # registers ScrollTrigger
   assets/                 # container.glb + logos/*.svg

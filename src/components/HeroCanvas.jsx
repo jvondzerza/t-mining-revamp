@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 // The hero canvas scene — the instanced port-yard
 import HeroScene from '../three/PortYardScene'
 
-export default function GlobeCanvas() {
+export default function HeroCanvas() {
   const canvasRef = useRef(null)
   const sceneRef = useRef(null)
 
