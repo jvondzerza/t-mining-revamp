@@ -40,7 +40,6 @@ export default function Solution() {
   // mutable state the rAF loop reads without re-subscribing
   const activeRef = useRef(0)
   const pausedRef = useRef(false)
-  const hoverRef = useRef(false)
   const visibleRef = useRef(false)
   const progressRef = useRef(0)
   const barFills = useRef([])
@@ -124,18 +123,11 @@ export default function Solution() {
   // MOBILE: autoplay carousel, looping, independent of scroll
   useEffect(() => {
     if (!isMobile) return
-    const carousel = root.current.querySelector('.release-carousel')
     const card = root.current.querySelector('.release-card')
 
     // only run while the card is on screen
     const io = new IntersectionObserver(([e]) => (visibleRef.current = e.isIntersecting), { threshold: 0.35 })
     if (card) io.observe(card)
-
-    // pause on hover (mouse); touch + keyboard use the explicit pause button
-    const onEnter = () => (hoverRef.current = true)
-    const onLeave = () => (hoverRef.current = false)
-    carousel?.addEventListener('pointerenter', onEnter)
-    carousel?.addEventListener('pointerleave', onLeave)
 
     let raf
     if (reduceMotion) {
@@ -147,7 +139,7 @@ export default function Solution() {
         if (last == null) last = t
         const dt = t - last
         last = t
-        const stalled = pausedRef.current || hoverRef.current || !visibleRef.current
+        const stalled = pausedRef.current || !visibleRef.current
         if (!stalled) {
           progressRef.current += dt / SLIDE_MS
           if (progressRef.current >= 1) {
@@ -166,8 +158,6 @@ export default function Solution() {
     return () => {
       if (raf) cancelAnimationFrame(raf)
       io.disconnect()
-      carousel?.removeEventListener('pointerenter', onEnter)
-      carousel?.removeEventListener('pointerleave', onLeave)
     }
   }, [isMobile, reduceMotion])
 
