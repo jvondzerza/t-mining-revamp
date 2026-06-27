@@ -52,7 +52,7 @@ export default function Navbar() {
     <>
       <header className={`nav ${scrolled ? 'is-scrolled' : ''} ${hidden && !open ? 'is-hidden' : ''}`}>
         <a className="nav__logo" href="#top" onClick={(e) => go(e, '#top')} aria-label="T-Mining home">
-          <img src="/logos/t-mining-logo.png" alt="T-Mining — Blockchain Logistics" className="nav__logo-img" />
+          <img src={`${import.meta.env.BASE_URL}logos/t-mining-logo.png`} alt="T-Mining — Blockchain Logistics" className="nav__logo-img" />
         </a>
 
         <nav className="nav__links" aria-label="Primary">
