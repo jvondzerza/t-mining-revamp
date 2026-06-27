@@ -79,10 +79,6 @@ export default function Hero() {
         </div>
       </div>
 
-      <div className="hero__cue" aria-hidden="true">
-        <span className="hero__cue-text">Scroll</span>
-        <span className="hero__cue-line"><i /></span>
-      </div>
     </section>
   )
 }
