@@ -368,6 +368,14 @@ html.js .threat__right {
   align-items: center;
   gap: 0.7rem;
   z-index: 2;
+  /* light frosted capsule so it stays readable over the container yard */
+  padding: 0.95rem 0.5rem;
+  background: rgba(251, 252, 254, 0.72);
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  box-shadow: 0 10px 30px -18px rgba(15, 42, 76, 0.45);
 }
 /* below desktop the layout is too cramped for it — let the content breathe */
 @media (max-width: 1024px) {
@@ -382,8 +390,6 @@ html.js .threat__right {
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--fog-100);
-  /* soft halo keeps it legible where it sits over the containers */
-  text-shadow: 0 1px 10px rgba(251, 252, 254, 0.9);
 }
 .hero__cue-line {
   width: 1px;
