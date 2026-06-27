@@ -17,7 +17,7 @@ import dpLogo from '../assets/logos/dp-world.svg?url'
  * recoloured to the livery and the side gets the carrier name stencilled
  * on. A warm light-sweep crosses the yard.
  *
- * Mounted by GlobeCanvas via the shared hero-scene interface:
+ * Mounted by HeroCanvas via the shared hero-scene interface:
  * constructor(canvas, { mobile }), setPointer, pause, resume, dispose.
  * ------------------------------------------------------------------ */
 
