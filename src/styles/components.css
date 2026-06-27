@@ -298,17 +298,15 @@ html.js .threat__right {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  /* stronger scrim so the headline + copy stay legible over the container yard */
   background:
-    radial-gradient(46% 34% at 72% 24%, rgba(191, 143, 46, 0.06), transparent 70%),
-    linear-gradient(180deg, transparent 0%, transparent 28%, rgba(251, 252, 254, 0.86) 52%, var(--ink-900) 74%);
+    radial-gradient(46% 38% at 72% 30%, rgba(191, 143, 46, 0.07), transparent 70%),
+    linear-gradient(180deg, transparent 0%, transparent 26%, var(--ink-900) 72%);
 }
 @media (min-width: 1025px) {
   .hero__glow {
     background:
-      radial-gradient(45% 55% at 80% 30%, rgba(191, 143, 46, 0.06), transparent 70%),
-      linear-gradient(95deg, var(--ink-900) 0%, rgba(251, 252, 254, 0.88) 33%, rgba(251, 252, 254, 0.34) 52%, transparent 72%),
-      linear-gradient(0deg, var(--ink-900) 6%, transparent 40%);
+      radial-gradient(42% 50% at 74% 42%, rgba(191, 143, 46, 0.08), transparent 70%),
+      radial-gradient(75% 85% at 22% 78%, var(--ink-900) 32%, transparent 72%);
   }
 }
 .hero__content {
