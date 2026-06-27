@@ -1,37 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap, ScrollTrigger } from '../lib/gsap'
-
-const STEPS = [
-  {
-    k: 'eDO',
-    title: 'The carrier issues an eDO',
-    body: 'Instead of a PIN, the shipping line releases the container as an electronic Delivery Order — a secure, single-source token of ownership.',
-    status: 'Token issued',
-  },
-  {
-    k: 'transfer',
-    title: 'The right to pick up moves digitally',
-    body: 'Forwarders and hauliers pass that right from party to party. Each transfer is cryptographically signed — never copied, always revocable.',
-    status: 'Right transferred',
-  },
-  {
-    k: 'identity',
-    title: 'The driver proves who they are',
-    body: 'At the terminal gate the holder verifies with trusted digital identity. No code to steal, nothing to brute-force.',
-    status: 'Identity verified',
-  },
-  {
-    k: 'release',
-    title: 'The container is released — and recorded',
-    body: 'It is handed only to the rightful party, and every step is traceable end-to-end. Fraud loses its foothold.',
-    status: 'Released · logged',
-  },
-]
+import { useT } from '../i18n'
 
 const SLIDE_MS = 5000 // mobile autoplay: time each step is shown
 
+const fill = (tpl, vars) => tpl.replace(/\{(\w+)\}/g, (_, k) => vars[k])
+
 export default function Solution() {
   const root = useRef(null)
+  const t = useT()
+  const steps = t.solution.steps
+  const c = t.solution.controls
+
   const [active, setActive] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
   const [reduceMotion, setReduceMotion] = useState(false)
@@ -66,8 +46,8 @@ export default function Solution() {
     setActive(i)
     paintFills()
   }
-  const next = () => goTo((activeRef.current + 1) % STEPS.length)
-  const prev = () => goTo((activeRef.current - 1 + STEPS.length) % STEPS.length)
+  const next = () => goTo((activeRef.current + 1) % steps.length)
+  const prev = () => goTo((activeRef.current - 1 + steps.length) % steps.length)
 
   // track viewport mode + motion preference
   useEffect(() => {
@@ -90,14 +70,14 @@ export default function Solution() {
   useEffect(() => {
     if (isMobile) return
     const ctx = gsap.context(() => {
-      const steps = gsap.utils.toArray('.solution__step')
+      const stepEls = gsap.utils.toArray('.solution__step')
       const grid = root.current.querySelector('.solution__grid')
       const card = root.current.querySelector('.release-card')
       const pickActive = () => {
         const cardLine = window.innerHeight * 0.18 + (card?.offsetHeight || 0) / 2
         let best = 0
         let bestDist = Infinity
-        steps.forEach((step, i) => {
+        stepEls.forEach((step, i) => {
           const r = step.getBoundingClientRect()
           const d = Math.abs(r.top + r.height / 2 - cardLine)
           if (d < bestDist) {
@@ -135,16 +115,16 @@ export default function Solution() {
       paintFills()
     } else {
       let last = null
-      const tick = (t) => {
-        if (last == null) last = t
-        const dt = t - last
-        last = t
+      const tick = (ts) => {
+        if (last == null) last = ts
+        const dt = ts - last
+        last = ts
         const stalled = pausedRef.current || !visibleRef.current
         if (!stalled) {
           progressRef.current += dt / SLIDE_MS
           if (progressRef.current >= 1) {
             progressRef.current = 0
-            const n = (activeRef.current + 1) % STEPS.length
+            const n = (activeRef.current + 1) % steps.length
             activeRef.current = n
             setActive(n)
           }
@@ -184,46 +164,40 @@ export default function Solution() {
     <section className="section solution" id="solution" ref={root}>
       <div className="container">
         <header className="solution__head">
-          <span className="eyebrow" data-reveal="up">Secure Container Release</span>
-          <h2 className="section-title" data-reveal="up">
-            We replaced the PIN with proof.
-          </h2>
-          <p className="lead solution__intro" data-reveal="up">
-            Secure Container Release is the electronic Delivery Order trusted by the
-            world&rsquo;s largest carriers — turning container pickup from a shared
-            secret into a chain of verified identity.
-          </p>
+          <span className="eyebrow" data-reveal="up">{t.solution.eyebrow}</span>
+          <h2 className="section-title" data-reveal="up">{t.solution.title}</h2>
+          <p className="lead solution__intro" data-reveal="up">{t.solution.intro}</p>
         </header>
 
         <div className="solution__grid">
           <div className="solution__stage">
           {/* sticky visual */}
           <div className="solution__visual">
-            <div className="release-card" data-active={STEPS[active].k}>
+            <div className="release-card" data-active={steps[active].key}>
               <div className="release-card__top">
                 <span className="release-card__brand">
-                  <span className="dot" /> SCR · eDO
+                  <span className="dot" /> {t.solution.brand}
                 </span>
-                <span className="release-card__iso">ISO 27001</span>
+                <span className="release-card__iso">{t.solution.iso}</span>
               </div>
 
               <div className="release-card__id">
-                <span className="release-card__label">Container</span>
+                <span className="release-card__label">{t.solution.containerLabel}</span>
                 <span className="release-card__value">MSCU&nbsp;784 219&nbsp;1</span>
               </div>
 
               <div className="release-card__flow">
-                {STEPS.map((s, i) => (
+                {steps.map((s, i) => (
                   <div
-                    key={s.k}
+                    key={s.key}
                     className={`release-node ${i === active ? 'is-active' : ''} ${i < active ? 'is-done' : ''}`}
                   >
                     <span className="release-node__dot" />
-                    <span className="release-node__name">{s.k}</span>
+                    <span className="release-node__name">{s.node}</span>
                   </div>
                 ))}
                 <div className="release-card__rail">
-                  <span style={{ transform: `scaleX(${active / (STEPS.length - 1)})` }} />
+                  <span style={{ transform: `scaleX(${active / (steps.length - 1)})` }} />
                 </div>
               </div>
 
@@ -234,7 +208,7 @@ export default function Solution() {
                     <path d="m8.5 12 2.5 2.5 4.5-5" stroke="currentColor" strokeWidth="1.6" />
                   </svg>
                 </span>
-                <span className="release-card__status-text">{STEPS[active].status}</span>
+                <span className="release-card__status-text">{steps[active].status}</span>
               </div>
 
               {/* mobile only: the steps become an autoplaying carousel inside the
@@ -243,17 +217,17 @@ export default function Solution() {
                 className="release-carousel"
                 role="group"
                 aria-roledescription="carousel"
-                aria-label="How Secure Container Release works"
+                aria-label={c.carouselLabel}
                 onKeyDown={onKeyDown}
               >
                 <div className="release-card__steps" aria-live={live} aria-atomic="true">
-                  {STEPS.map((s, i) => (
+                  {steps.map((s, i) => (
                     <div
-                      key={s.k}
+                      key={s.key}
                       className={`release-card__step ${i === active ? 'is-active' : ''}`}
                       role="group"
                       aria-roledescription="slide"
-                      aria-label={`Step ${i + 1} of ${STEPS.length}: ${s.title}`}
+                      aria-label={fill(c.slideLabel, { n: i + 1, total: steps.length, title: s.title })}
                       aria-hidden={i !== active}
                     >
                       <span className="release-card__step-n">0{i + 1}</span>
@@ -264,12 +238,12 @@ export default function Solution() {
                 </div>
 
                 <div className="release-carousel__bars">
-                  {STEPS.map((s, i) => (
+                  {steps.map((s, i) => (
                     <button
-                      key={s.k}
+                      key={s.key}
                       type="button"
                       className="release-carousel__bar"
-                      aria-label={`Show step ${i + 1}: ${s.title}`}
+                      aria-label={fill(c.goToLabel, { n: i + 1, title: s.title })}
                       aria-current={i === active ? 'step' : undefined}
                       onClick={() => goTo(i)}
                     >
@@ -279,7 +253,7 @@ export default function Solution() {
                 </div>
 
                 <div className="release-carousel__buttons">
-                  <button type="button" className="release-carousel__btn" aria-label="Previous step" onClick={prev}>
+                  <button type="button" className="release-carousel__btn" aria-label={c.prev} onClick={prev}>
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
                       <path d="M15 5 8 12l7 7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
@@ -288,7 +262,7 @@ export default function Solution() {
                     <button
                       type="button"
                       className="release-carousel__btn release-carousel__btn--play"
-                      aria-label={paused ? 'Play steps' : 'Pause steps'}
+                      aria-label={paused ? c.play : c.pause}
                       aria-pressed={paused}
                       onClick={() => setPaused((p) => !p)}
                     >
@@ -304,7 +278,7 @@ export default function Solution() {
                       )}
                     </button>
                   )}
-                  <button type="button" className="release-carousel__btn" aria-label="Next step" onClick={next}>
+                  <button type="button" className="release-carousel__btn" aria-label={c.next} onClick={next}>
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
                       <path d="M9 5l7 7-7 7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
@@ -316,9 +290,9 @@ export default function Solution() {
 
           {/* steps (desktop column) */}
           <ol className="solution__steps">
-            {STEPS.map((s, i) => (
+            {steps.map((s, i) => (
               <li
-                key={s.k}
+                key={s.key}
                 className={`solution__step ${i === active ? 'is-active' : ''}`}
               >
                 <span className="solution__step-n">0{i + 1}</span>

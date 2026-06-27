@@ -1,5 +1,6 @@
-import { useEffect, useRef, lazy, Suspense } from 'react'
+import { useEffect, useRef, lazy, Suspense, Fragment } from 'react'
 import { gsap, ScrollTrigger } from '../lib/gsap'
+import { useT } from '../i18n'
 import ErrorBoundary from './ErrorBoundary'
 
 // Three.js is heavy (~600KB) and only needed for the hero backdrop — load it
@@ -8,6 +9,7 @@ const GlobeCanvas = lazy(() => import('./GlobeCanvas'))
 
 export default function Hero() {
   const root = useRef(null)
+  const t = useT()
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -42,43 +44,44 @@ export default function Hero() {
 
       <div className="hero__content container">
         <div className="hero__top">
-          <span className="hero__reveal hero__reveal--fade tag"><span className="dot" /> Blockchain logistics · since 2016</span>
+          <span className="hero__reveal hero__reveal--fade tag"><span className="dot" /> {t.hero.tag}</span>
         </div>
 
         <h1 className="hero__title display">
-          <span className="mask"><span className="hero__reveal">Securing the</span></span>
-          <span className="mask"><span className="hero__reveal">flow of <em>global</em></span></span>
-          <span className="mask"><span className="hero__reveal">trade.</span></span>
+          {t.hero.title.map((line, i) => (
+            <span className="mask" key={i}>
+              <span className="hero__reveal">
+                {line.map((seg, j) =>
+                  seg.em ? <em key={j}>{seg.t}</em> : <Fragment key={j}>{seg.t}</Fragment>
+                )}
+              </span>
+            </span>
+          ))}
         </h1>
 
         <div className="hero__bottom">
           <div className="mask hero__lead-mask">
-            <p className="hero__reveal lead hero__lead">
-              We build decentralized networks that make maritime supply chains
-              radically more secure, sustainable and private — beginning with the
-              one thing the world runs on: the container.
-            </p>
+            <p className="hero__reveal lead hero__lead">{t.hero.lead}</p>
           </div>
           <div className="hero__bottom-right">
             <div className="hero__coords" aria-hidden="true">
-              <span>51.2194° N</span>
-              <span>4.4025° E</span>
-              <span>Port of Antwerp-Bruges</span>
+              <span>{t.hero.coords[0]}</span>
+              <span>{t.hero.coords[1]}</span>
+              <span>{t.hero.coords[2]}</span>
             </div>
             <div className="hero__actions mask">
               <span className="hero__reveal hero__actions-inner">
                 <a href="#solution" className="btn btn--primary" data-scroll="#solution">
-                  Discover Secure Container Release <span className="arrow">↗</span>
+                  {t.hero.discover} <span className="arrow">↗</span>
                 </a>
                 <a href="#contact" className="btn" data-scroll="#contact">
-                  Book a demo
+                  {t.hero.bookDemo}
                 </a>
               </span>
             </div>
           </div>
         </div>
       </div>
-
     </section>
   )
 }

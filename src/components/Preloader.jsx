@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from '../lib/gsap'
+import { useT } from '../i18n'
 
 export default function Preloader() {
+  const t = useT()
   const root = useRef(null)
   const countRef = useRef(null)
   const barRef = useRef(null)
@@ -97,7 +99,7 @@ export default function Preloader() {
         </div>
         <div className="preloader__meta">
           <span className="preloader__count" ref={countRef}>00</span>
-          <span className="preloader__label">Securing global trade</span>
+          <span className="preloader__label">{t.preloader.label}</span>
         </div>
         <div className="preloader__track">
           <span className="preloader__bar" ref={barRef} />

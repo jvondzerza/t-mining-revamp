@@ -1,11 +1,13 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from '../lib/gsap'
+import { useT } from '../i18n'
 
+// numeric config (locale-independent); labels come from translations
 const STATS = [
-  { value: 5000, suffix: '+', label: 'Logistics companies connected', fmt: true },
-  { value: 25, suffix: '+', label: 'Countries on the network' },
-  { value: 3, suffix: '', label: 'Of the world’s largest carriers' },
-  { value: 100, suffix: '%', label: 'PIN-free container release' },
+  { value: 5000, suffix: '+', fmt: true },
+  { value: 25, suffix: '+' },
+  { value: 3, suffix: '' },
+  { value: 100, suffix: '%' },
 ]
 
 function Counter({ value, suffix, fmt }) {
@@ -35,6 +37,7 @@ function Counter({ value, suffix, fmt }) {
 
 export default function Network() {
   const root = useRef(null)
+  const t = useT()
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -59,23 +62,21 @@ export default function Network() {
     <section className="section network" id="network" ref={root}>
       <div className="container">
         <div className="network__head">
-          <span className="eyebrow" data-reveal="up">The network effect</span>
+          <span className="eyebrow" data-reveal="up">{t.network.eyebrow}</span>
           <h2 className="section-title network__title" data-reveal="up">
-            One network. <span className="text-gold">Every</span> party in the chain.
+            {t.network.title.pre}
+            <span className="text-gold">{t.network.title.em}</span>
+            {t.network.title.post}
           </h2>
-          <p className="lead network__lead" data-reveal="up">
-            Security only works if everyone is on it. That&rsquo;s why Secure Container
-            Release already links carriers, terminals, forwarders and hauliers into a
-            single trusted fabric — and it keeps growing.
-          </p>
+          <p className="lead network__lead" data-reveal="up">{t.network.lead}</p>
         </div>
 
         <div className="network__stats">
-          {STATS.map((s) => (
-            <div className="stat" key={s.label}>
+          {STATS.map((s, i) => (
+            <div className="stat" key={i}>
               <span className="stat__content">
                 <Counter value={s.value} suffix={s.suffix} fmt={s.fmt} />
-                <span className="stat__label">{s.label}</span>
+                <span className="stat__label">{t.network.stats[i]}</span>
               </span>
             </div>
           ))}
