@@ -356,52 +356,6 @@ html.js .threat__right {
   gap: 0.9rem;
   justify-content: flex-end;
 }
-/* sit the cue on the right margin, vertically centred, so it never collides
-   with the bottom-anchored content (which fills the lower band edge-to-edge) */
-.hero__cue {
-  position: absolute;
-  right: clamp(14px, 2.4vw, 36px);
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.7rem;
-  z-index: 2;
-}
-/* below desktop the layout is too cramped for it — let the content breathe */
-@media (max-width: 1024px) {
-  .hero__cue {
-    display: none;
-  }
-}
-.hero__cue-text {
-  writing-mode: vertical-rl;
-  font-family: var(--font-display);
-  font-size: 0.7rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--fog-100);
-  /* soft halo keeps it legible where it sits over the containers */
-  text-shadow: 0 1px 10px rgba(251, 252, 254, 0.9);
-}
-.hero__cue-line {
-  width: 1px;
-  height: 60px;
-  background: rgba(15, 42, 76, 0.14);
-  overflow: hidden;
-  position: relative;
-}
-.hero__cue-line i {
-  position: absolute;
-  inset: 0;
-  background: var(--gold);
-  animation: cueSlide 2.2s var(--ease-io) infinite;
-}
-@keyframes cueSlide {
-  0% { transform: translateY(-100%); }
-  60%, 100% { transform: translateY(100%); }
-}
 .hero__coords {
   display: flex;
   flex-direction: column;
@@ -1538,9 +1492,6 @@ html.js .threat__right {
     justify-content: flex-start;
   }
   .hero__coords {
-    display: none;
-  }
-  .hero__cue {
     display: none;
   }
   .pillars__grid,
