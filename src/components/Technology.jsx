@@ -60,8 +60,10 @@ export default function Technology() {
         </div>
 
         <div className="technology__right" data-reveal="stagger">
-          {t.technology.features.map((f) => (
-            <article className="tech__feature" key={f.k} data-stagger-item>
+          {t.technology.features.map((f, i) => (
+            // key by index, not translated copy — a language switch must reuse
+            // these nodes so their reveal animation state survives
+            <article className="tech__feature" key={i} data-stagger-item>
               <span className="tech__feature-k">{f.k}</span>
               <h3 className="tech__feature-title">{f.title}</h3>
               <p className="tech__feature-body">{f.body}</p>

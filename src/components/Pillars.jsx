@@ -34,7 +34,9 @@ export default function Pillars() {
 
         <div className="pillars__grid" data-reveal="stagger">
           {t.pillars.items.map((p, i) => (
-            <article className="pillar" key={p.index} data-stagger-item>
+            // key by index, not translated copy — a language switch must reuse
+            // these nodes so their reveal animation state survives
+            <article className="pillar" key={i} data-stagger-item>
               <div className="pillar__top">
                 <span className="pillar__icon">{ICONS[i]}</span>
                 <span className="pillar__index">{p.index}</span>

@@ -5,7 +5,7 @@ import ErrorBoundary from './ErrorBoundary'
 
 // Three.js is heavy (~600KB) and only needed for the hero backdrop — load it
 // lazily so it streams in behind the preloader instead of blocking first paint.
-const GlobeCanvas = lazy(() => import('./GlobeCanvas'))
+const HeroCanvas = lazy(() => import('./HeroCanvas'))
 
 export default function Hero() {
   const root = useRef(null)
@@ -36,7 +36,7 @@ export default function Hero() {
       <div className="hero__globe">
         <ErrorBoundary>
           <Suspense fallback={null}>
-            <GlobeCanvas />
+            <HeroCanvas />
           </Suspense>
         </ErrorBoundary>
         <div className="hero__glow" aria-hidden="true" />
