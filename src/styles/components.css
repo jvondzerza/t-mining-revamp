@@ -356,6 +356,7 @@ html.js .threat__right {
   border-radius: 9px;
   cursor: pointer;
   text-align: left;
+  text-decoration: none;
   transition: background 0.2s, color 0.2s;
 }
 .lang__option:hover {
@@ -399,11 +400,16 @@ html.js .threat__right {
   gap: 0.4rem;
 }
 .lang-inline__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 48px;
   padding: 0.55rem 0.6rem;
   font-family: var(--font-display);
   font-size: 0.85rem;
   letter-spacing: 0.04em;
+  text-align: center;
+  text-decoration: none;
   color: var(--fog-300);
   background: transparent;
   border: 1px solid var(--line-strong);
