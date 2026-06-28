@@ -456,15 +456,35 @@ html.js .threat__right {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  /* The bottom fade doubles as a legibility wash behind the hero copy. On phones
+     the title (incl. the gold em) sits over the yard, so the wash ramps in a
+     little earlier and stronger through the title band — calming the containers
+     behind the text — while the upper yard stays clear. */
   background:
     radial-gradient(46% 38% at 72% 30%, rgba(191, 143, 46, 0.07), transparent 70%),
-    linear-gradient(180deg, transparent 0%, transparent 26%, var(--ink-900) 72%);
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 16%,
+      rgba(251, 252, 254, 0.7) 44%,
+      var(--ink-900) 68%
+    );
+}
+/* Tablet had no legibility issue — keep the original, gentler bottom fade. */
+@media (min-width: 701px) and (max-width: 1024px) {
+  .hero__glow {
+    background:
+      radial-gradient(46% 38% at 72% 30%, rgba(191, 143, 46, 0.07), transparent 70%),
+      linear-gradient(180deg, transparent 0%, transparent 26%, var(--ink-900) 72%);
+  }
 }
 @media (min-width: 1025px) {
   .hero__glow {
     background:
       radial-gradient(42% 50% at 74% 42%, rgba(191, 143, 46, 0.08), transparent 70%),
-      radial-gradient(75% 85% at 22% 78%, var(--ink-900) 32%, transparent 72%);
+      /* anchored bottom-left under the title; widened horizontally so the wash
+         reaches a bit further right across the hero */
+      radial-gradient(92% 85% at 22% 78%, var(--ink-900) 32%, transparent 74%);
   }
 }
 .hero__content {
