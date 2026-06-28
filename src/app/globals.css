@@ -1,0 +1,5 @@
+/* Global styles for the App Router. The existing hand-written stylesheets are
+   imported as-is; only the two font-family variables in index.css were changed
+   to reference the next/font CSS variables. */
+@import '../styles/index.css';
+@import '../styles/components.css';

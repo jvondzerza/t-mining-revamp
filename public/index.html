@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>T-Mining</title>
+    <!-- This file has no statically-generated route (content lives at /en/, /nl/, /fr/),
+         so it is the landing page for the bare base URL. Send visitors to their
+         remembered / preferred language; canonical + noindex keep it out of the index. -->
+    <link rel="canonical" href="https://jvondzerza.github.io/t-mining-revamp/en/" />
+    <meta name="robots" content="noindex" />
+    <script>
+      (function () {
+        var langs = ['en', 'nl', 'fr']
+        var base = '/t-mining-revamp/'
+        var chosen
+        try {
+          chosen = localStorage.getItem('tmining-lang')
+        } catch (e) {}
+        if (langs.indexOf(chosen) === -1) {
+          var nav = (navigator.language || 'en').slice(0, 2).toLowerCase()
+          chosen = langs.indexOf(nav) !== -1 ? nav : 'en'
+        }
+        location.replace(base + chosen + '/')
+      })()
+    </script>
+    <!-- no-JS fallback -->
+    <meta http-equiv="refresh" content="0; url=./en/" />
+  </head>
+  <body>
+    Redirecting to <a href="./en/">t-mining.be</a>…
+  </body>
+</html>

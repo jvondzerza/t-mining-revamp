@@ -1,9 +1,11 @@
 node_modules
-dist
-dist-ssr
+
+# Next.js
+.next
+out
+
 *.local
 .DS_Store
-.vite
 
 # local-only Claude Code settings (machine-specific permissions)
 .claude/settings.local.json

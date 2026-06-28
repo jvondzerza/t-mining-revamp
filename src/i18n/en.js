@@ -1,5 +1,10 @@
 // English — the source copy. nl.js / fr.js mirror this structure exactly.
 export default {
+  seo: {
+    title: 'T-Mining — Securing the Flow of Global Trade',
+    description:
+      'T-Mining builds decentralized networks that make maritime supply chains more secure, sustainable and private. Secure Container Release replaces vulnerable PIN codes with trusted digital identity.',
+  },
   nav: {
     links: ['Solution', 'Why it matters', 'Network', 'Technology', 'Insights'],
     bookDemo: 'Book a demo',

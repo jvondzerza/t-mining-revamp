@@ -1,5 +1,10 @@
 // Français
 export default {
+  seo: {
+    title: 'T-Mining — Sécuriser les flux du commerce mondial',
+    description:
+      'T-Mining construit des réseaux décentralisés qui rendent les chaînes logistiques maritimes plus sûres, durables et confidentielles. Secure Container Release remplace les codes PIN vulnérables par une identité numérique de confiance.',
+  },
   nav: {
     links: ['Solution', 'Pourquoi c’est important', 'Réseau', 'Technologie', 'Analyses'],
     bookDemo: 'Réserver une démo',

@@ -22,7 +22,7 @@ export default function HeroCanvas() {
         if (reduce) scene.pause()
       } catch (err) {
         // WebGL unavailable / context lost — leave the CSS gradient as backdrop
-        if (import.meta.env.DEV) console.warn('[HeroScene] init failed:', err?.message)
+        if (process.env.NODE_ENV !== 'production') console.warn('[HeroScene] init failed:', err?.message)
       }
     })
 
