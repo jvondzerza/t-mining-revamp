@@ -37,9 +37,9 @@
   --text: var(--fog-200);
   --muted: var(--fog-400);
 
-  /* type */
-  --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  /* type — families injected by next/font (see app/[lang]/layout.jsx) */
+  --font-display: var(--font-space-grotesk), 'Inter', system-ui, sans-serif;
+  --font-body: var(--font-inter), system-ui, -apple-system, sans-serif;
 
   /* layout */
   --container: 1320px;

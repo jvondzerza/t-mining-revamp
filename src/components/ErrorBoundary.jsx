@@ -15,7 +15,7 @@ export default class ErrorBoundary extends Component {
   }
 
   componentDidCatch(err) {
-    if (import.meta.env.DEV) console.warn('[HeroCanvas] disabled:', err?.message)
+    if (process.env.NODE_ENV !== 'production') console.warn('[HeroCanvas] disabled:', err?.message)
   }
 
   render() {

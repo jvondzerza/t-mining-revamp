@@ -1,51 +1,22 @@
-import { createContext, useContext, useEffect, useState } from 'react'
-import en from './en'
-import nl from './nl'
-import fr from './fr'
+'use client'
 
-const DICT = { en, nl, fr }
+import { createContext, useContext } from 'react'
+import { DICT, DEFAULT_LOCALE, LANGS } from './dictionaries'
 
-// the languages offered in the switcher (order = display order)
-export const LANGS = [
-  { code: 'en', label: 'English', short: 'EN' },
-  { code: 'nl', label: 'Nederlands', short: 'NL' },
-  { code: 'fr', label: 'Français', short: 'FR' },
-]
-
-const STORAGE_KEY = 'tmining-lang'
-
-// saved choice → browser language → English
-function detectLang() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved && DICT[saved]) return saved
-  } catch {
-    /* ignore storage failures */
-  }
-  const nav = (navigator.language || 'en').slice(0, 2).toLowerCase()
-  return DICT[nav] ? nav : 'en'
-}
+export { LANGS }
 
 const LangContext = createContext(null)
 
-export function LanguageProvider({ children }) {
-  const [lang, setLangState] = useState(detectLang)
-
-  useEffect(() => {
-    document.documentElement.lang = lang
-    try {
-      localStorage.setItem(STORAGE_KEY, lang)
-    } catch {
-      /* ignore */
-    }
-  }, [lang])
-
-  const setLang = (code) => {
-    if (DICT[code]) setLangState(code)
-  }
-
+/**
+ * Provides the active language + its dictionary. The language is fixed by the
+ * route (one statically-generated page per locale), so this no longer detects
+ * or stores anything — switching languages is navigation, handled by
+ * <LanguageSwitcher>.
+ */
+export function LanguageProvider({ lang, children }) {
+  const code = DICT[lang] ? lang : DEFAULT_LOCALE
   return (
-    <LangContext.Provider value={{ lang, setLang, t: DICT[lang] }}>
+    <LangContext.Provider value={{ lang: code, t: DICT[code] }}>
       {children}
     </LangContext.Provider>
   )

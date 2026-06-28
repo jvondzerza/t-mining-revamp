@@ -15,7 +15,7 @@ export default function Footer() {
         <div className="footer__top">
           <div className="footer__brand">
             <a href="#top" className="footer__logo" onClick={toTop} aria-label="T-Mining home">
-              <img src={`${import.meta.env.BASE_URL}logos/t-mining-logo.png`} alt="T-Mining — Blockchain Logistics" className="footer__logo-img" />
+              <img src={`${process.env.NEXT_PUBLIC_BASE_PATH}/logos/t-mining-logo.png`} alt="T-Mining — Blockchain Logistics" className="footer__logo-img" />
             </a>
             <p className="footer__tag">{t.footer.tag}</p>
             <span className="footer__iso tag">

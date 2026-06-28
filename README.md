@@ -5,9 +5,11 @@ Antwerp blockchain-logistics company whose **Secure Container Release** product
 replaces vulnerable PIN codes with trusted digital identity for maritime container
 release.
 
-Built as a React single-page experience with a custom **Three.js** hero — a low 3/4 view
-across an endless, fog-faded **container yard** rendered from one GPU instanced mesh — and
-**GSAP + Lenis** for scroll-driven storytelling. Crisp-white maritime theme: deep navy with
+Built as a **Next.js (App Router)** site, statically exported to GitHub Pages, with a custom
+**Three.js** hero — a low 3/4 view across an endless, fog-faded **container yard** rendered
+from one GPU instanced mesh — and **GSAP + Lenis** for scroll-driven storytelling. Each
+language (EN/NL/FR) is pre-rendered to its own static page (`/en/`, `/nl/`, `/fr/`) with
+localized `<title>`/meta and `hreflang` for SEO. Crisp-white maritime theme: deep navy with
 container-drawn **blue** and **orange** accents, and T-Mining's **gold** kept as the brand
 signature. The official T-Mining logo lives in `public/logos/`.
 
@@ -20,29 +22,31 @@ signature. The official T-Mining logo lives in `public/logos/`.
 
 | | |
 |---|---|
-| Framework | React 18 + Vite |
+| Framework | React 18 + Next.js 14 (App Router, static export) |
 | 3D | Three.js (hand-written scenes, no wrapper lib) + `GLTFLoader` |
 | Animation | GSAP + ScrollTrigger |
 | Smooth scroll | Lenis (synced to the GSAP ticker) |
+| i18n | EN/NL/FR, one statically-generated page per locale |
 | Styling | Hand-rolled CSS design system (CSS custom properties) |
 
 ## Run it
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173
-npm run build      # production bundle → dist/
-npm run preview    # serve the built bundle
+npm run dev        # http://localhost:3000/t-mining-revamp/en/
+npm run build      # static export → out/
 ```
+
+Deployed to GitHub Pages via `.github/workflows/deploy.yml` on every push to `main`.
 
 ## What's in here
 
 The hero centrepiece is a procedural **port yard**: a low-poly shipping-container model
-(`src/assets/container.glb`) is GPU-instanced thousands of times in a couple of draw calls,
+(`public/models/container.glb`) is GPU-instanced thousands of times in a couple of draw calls,
 laid out as stacked rows that recede into fog. Containers are grouped by **carrier** and
 repainted into real liveries — **MSC** (gold), **CMA CGM** (blue), **Hapag-Lloyd** (orange),
 **DP World** (navy), plus neutral grey for generic/leased boxes — with each carrier's logo
-(from `src/assets/logos/`) composited onto the side. A warm light-sweep crosses the yard on
+(from `public/logos/carriers/`) composited onto the side. A warm light-sweep crosses the yard on
 a loop. Liveries/weights are configured in the `CARRIERS` table at the bottom of
 `PortYardScene.js`.
 
@@ -58,12 +62,17 @@ bars, and full keyboard/`aria`/reduced-motion support) so the user can scroll pa
 
 ```
 src/
-  three/PortYardScene.js   # the instanced container yard (vanilla three + GLTFLoader)
-  components/              # Hero, HeroCanvas (mount), ErrorBoundary, Navbar, Preloader, sections…
+  app/
+    [lang]/               # one static page per locale (layout sets <html lang> + metadata)
+    sitemap.js robots.js  # generated sitemap.xml + robots.txt
+    globals.css           # imports the stylesheets below
+  components/             # SiteShell (client boundary) + Hero, HeroCanvas, Navbar, sections…
   hooks/                  # useSmoothScroll (Lenis↔GSAP), useReveal (scroll reveals)
   lib/gsap.js             # registers ScrollTrigger
-  assets/                 # container.glb + logos/*.svg
+  i18n/                   # dictionaries.js (EN/NL/FR data) + index.jsx (provider/useT)
+  three/PortYardScene.js  # the instanced container yard (vanilla three + GLTFLoader)
   styles/                 # index.css (design tokens) + components.css
+public/                   # container.glb, logos, favicon, root-redirect index.html, .nojekyll
 ```
 
 ## Performance & resilience

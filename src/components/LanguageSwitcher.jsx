@@ -1,5 +1,10 @@
+'use client'
+
 import { useEffect, useRef, useState } from 'react'
-import { LANGS, useI18n } from '../i18n'
+import Link from 'next/link'
+import { LANGS } from '../i18n'
+import { STORAGE_KEY } from '../i18n/dictionaries'
+import { useI18n } from '../i18n'
 
 const GlobeIcon = () => (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
@@ -8,27 +13,37 @@ const GlobeIcon = () => (
   </svg>
 )
 
+// each language is its own statically-generated route; switching is navigation
+const localeHref = (code) => `/${code}/`
+const remember = (code) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, code)
+  } catch {
+    /* ignore storage failures */
+  }
+}
+
 /**
  * Language picker.
  *  - variant="dropdown" (default): a button + menu, for the desktop nav.
  *  - variant="inline": a row of buttons, for the mobile menu.
  */
 export default function LanguageSwitcher({ variant = 'dropdown' }) {
-  const { lang, setLang, t } = useI18n()
+  const { lang, t } = useI18n()
 
   if (variant === 'inline') {
     return (
       <div className="lang-inline" role="group" aria-label={t.nav.language}>
         {LANGS.map((l) => (
-          <button
+          <Link
             key={l.code}
-            type="button"
+            href={localeHref(l.code)}
             className={`lang-inline__btn ${l.code === lang ? 'is-active' : ''}`}
-            aria-pressed={l.code === lang}
-            onClick={() => setLang(l.code)}
+            aria-current={l.code === lang ? 'true' : undefined}
+            onClick={() => remember(l.code)}
           >
             {l.short}
-          </button>
+          </Link>
         ))}
       </div>
     )
@@ -55,7 +70,7 @@ export default function LanguageSwitcher({ variant = 'dropdown' }) {
   }, [open])
 
   const choose = (code) => {
-    setLang(code)
+    remember(code)
     setOpen(false)
   }
 
@@ -79,9 +94,9 @@ export default function LanguageSwitcher({ variant = 'dropdown' }) {
       {open && (
         <div className="lang__menu" role="menu" aria-label={t.nav.language}>
           {LANGS.map((l) => (
-            <button
+            <Link
               key={l.code}
-              type="button"
+              href={localeHref(l.code)}
               role="menuitemradio"
               aria-checked={l.code === lang}
               className={`lang__option ${l.code === lang ? 'is-active' : ''}`}
@@ -89,7 +104,7 @@ export default function LanguageSwitcher({ variant = 'dropdown' }) {
             >
               <span className="lang__option-code">{l.short}</span>
               {l.label}
-            </button>
+            </Link>
           ))}
         </div>
       )}

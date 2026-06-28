@@ -1,5 +1,10 @@
 // Nederlands
 export default {
+  seo: {
+    title: 'T-Mining — De stroom van de wereldhandel beveiligen',
+    description:
+      'T-Mining bouwt gedecentraliseerde netwerken die maritieme toeleveringsketens veiliger, duurzamer en privacyvriendelijker maken. Secure Container Release vervangt kwetsbare pincodes door vertrouwde digitale identiteit.',
+  },
   nav: {
     links: ['Oplossing', 'Waarom het telt', 'Netwerk', 'Technologie', 'Inzichten'],
     bookDemo: 'Plan een demo',

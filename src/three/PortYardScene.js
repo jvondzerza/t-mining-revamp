@@ -1,10 +1,14 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import containerUrl from '../assets/container.glb?url'
-import mscLogo from '../assets/logos/msc.svg?url'
-import cmaLogo from '../assets/logos/cma-cgm.svg?url'
-import hapagLogo from '../assets/logos/hapag-lloyd.svg?url'
-import dpLogo from '../assets/logos/dp-world.svg?url'
+// Assets live in public/ and are served under the Pages base path. Next only
+// auto-prefixes next/link + next/image, so build these URLs from the exposed
+// base path ourselves.
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH || ''
+const containerUrl = `${BASE}/models/container.glb`
+const mscLogo = `${BASE}/logos/carriers/msc.svg`
+const cmaLogo = `${BASE}/logos/carriers/cma-cgm.svg`
+const hapagLogo = `${BASE}/logos/carriers/hapag-lloyd.svg`
+const dpLogo = `${BASE}/logos/carriers/dp-world.svg`
 
 /* ------------------------------------------------------------------ *
  * PortYardScene — Concept "Instanced port-yard".
@@ -115,7 +119,7 @@ export default class PortYardScene {
             const layout = this._computeLayout(CL, parts.H, parts.D)
             this._buildYard(parts, layout)
           } catch (err) {
-            if (import.meta.env.DEV) console.warn('[PortYard] model build failed:', err?.message)
+            if (process.env.NODE_ENV !== 'production') console.warn('[PortYard] model build failed:', err?.message)
             this._buildFallbackYard()
           }
         })
@@ -123,7 +127,7 @@ export default class PortYardScene {
       undefined,
       (err) => {
         if (this._disposed) return
-        if (import.meta.env.DEV) console.warn('[PortYard] glb load failed, using boxes:', err?.message)
+        if (process.env.NODE_ENV !== 'production') console.warn('[PortYard] glb load failed, using boxes:', err?.message)
         this._buildFallbackYard()
       }
     )
